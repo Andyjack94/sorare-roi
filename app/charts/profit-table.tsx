@@ -1,8 +1,10 @@
 "use client";
 
-export default function ProfitTable({ data }) {
+import { ProfitTableRow } from "@/types/types";
+
+export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
   // Extract year from competition string
-  const extractYear = (competition) => {
+  const extractYear = (competition: string): number => {
     if (!competition) return -1;
 
     // Match 4-digit year at end (e.g., 2026)
