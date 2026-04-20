@@ -1,6 +1,6 @@
 // SERVER COMPONENT
 import { supabase } from "@/lib/supabaseClient";
-import ProfitChart from "./profit-chart";
+import ProfitChart from "./ProfitChart";
 import ProfitTable from "./profit-table";
 import RewardsTable from "./rewards-table";
 

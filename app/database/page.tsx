@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { TransactionRow } from '@/types/types';
 
 export default function DatabasePage() {
-  const [transactions, setTransactions] = useState([]);
-  const [filters, setFilters] = useState({
+  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
+
+  const [filters, setFilters] = useState<Record<string, string>>({
     date: '',
     sale_date: '',
     type: '',
@@ -31,7 +33,7 @@ export default function DatabasePage() {
       .select('*')
       .order('date', { ascending: false });
 
-    setTransactions(data || []);
+    setTransactions((data as TransactionRow[]) || []);
   }
 
   useEffect(() => {
@@ -53,7 +55,7 @@ export default function DatabasePage() {
   }
 
   // Add profit to each row
-  const withProfit = transactions.map((t: any) => ({
+  const withProfit = transactions.map(t => ({
     ...t,
     profit:
       t.sale_value && t.purchase_value
@@ -61,17 +63,17 @@ export default function DatabasePage() {
         : '',
   }));
 
-  const filtered = withProfit.filter((t: any) =>
+  const filtered = withProfit.filter(t =>
     Object.keys(filters).every(key => {
       const filterValue = filters[key].toLowerCase();
       if (!filterValue) return true;
-      return String(t[key] ?? '').toLowerCase().includes(filterValue);
+      return String((t as any)[key] ?? '').toLowerCase().includes(filterValue);
     })
   );
 
-  const sorted = [...filtered].sort((a: any, b: any) => {
-    const valA = a[sortColumn] ?? '';
-    const valB = b[sortColumn] ?? '';
+  const sorted = [...filtered].sort((a, b) => {
+    const valA = (a as any)[sortColumn] ?? '';
+    const valB = (b as any)[sortColumn] ?? '';
 
     if (sortDirection === 'asc') {
       return String(valA).localeCompare(String(valB), undefined, { numeric: true });
@@ -88,8 +90,8 @@ export default function DatabasePage() {
     load();
   }
 
-  function handleEdit(row: any) {
-    const params = new URLSearchParams(row).toString();
+  function handleEdit(row: TransactionRow) {
+    const params = new URLSearchParams(row as any).toString();
     window.location.href = `/inputs?${params}`;
   }
 
@@ -138,7 +140,7 @@ export default function DatabasePage() {
             {Object.keys(filters).map(key => (
               <td key={key} style={{ padding: '0.3rem' }}>
                 <input
-                  value={(filters as any)[key]}
+                  value={filters[key]}
                   onChange={e => handleFilterChange(key, e.target.value)}
                   placeholder="Filter..."
                   style={{
@@ -155,7 +157,7 @@ export default function DatabasePage() {
         </thead>
 
         <tbody>
-          {paginated.map((t: any, i) => (
+          {paginated.map((t, i) => (
             <tr key={t.id} style={{ background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
               <td style={{ padding: '0.5rem', whiteSpace: 'nowrap' }}>
                 <button
@@ -210,11 +212,11 @@ export default function DatabasePage() {
                 style={{
                   padding: '0.5rem',
                   color:
-                    t.profit > 0 ? 'green' : t.profit < 0 ? 'red' : 'inherit',
-                  fontWeight: t.profit ? 600 : 400,
+                    (t as any).profit > 0 ? 'green' : (t as any).profit < 0 ? 'red' : 'inherit',
+                  fontWeight: (t as any).profit ? 600 : 400,
                 }}
               >
-                {t.profit !== '' ? Number(t.profit).toFixed(2) : ''}
+                {(t as any).profit !== '' ? Number((t as any).profit).toFixed(2) : ''}
               </td>
 
               <td style={{ padding: '0.5rem' }}>{t.notes}</td>
