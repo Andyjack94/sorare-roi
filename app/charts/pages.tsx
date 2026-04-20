@@ -1,10 +1,13 @@
-// SERVER COMPONENT
+// SERVER COMPONENT — but forced dynamic so it runs at runtime, not build time
+export const dynamic = "force-dynamic";
+
 import { supabase } from "@/lib/supabaseClient";
 import ProfitChart from "./ProfitChart";
 import ProfitTable from "./profit-table";
 import RewardsTable from "./rewards-table";
 
 export default async function ChartsPage() {
+  // Fetch at runtime (NOT during build)
   const { data: competitionProfit } = await supabase
     .from("competition_gross_profit")
     .select("*");

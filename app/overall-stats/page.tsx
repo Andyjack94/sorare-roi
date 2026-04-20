@@ -18,6 +18,7 @@ export default async function OverallStatsPage() {
     total_player_rewards = 0,
     current_gallery_value = 0,
     overall_profit = 0,
+    total_current_cards = 0, // ⭐ NEW FIELD
   } = data || {};
 
   const cardStyle = {
@@ -42,30 +43,28 @@ export default async function OverallStatsPage() {
       </h1>
 
       {/* ⭐ TOP-LINE OVERALL PROFIT */}
-<div style={{ ...cardStyle, marginBottom: "2rem" }}>
-  <div>Overall Profit / Loss</div>
+      <div style={{ ...cardStyle, marginBottom: "2rem" }}>
+        <div>Overall Profit / Loss</div>
 
-  <div
-    style={{
-      ...numberStyle,
-      color: overall_profit >= 0 ? "green" : "red",
-      display: "flex",
-      alignItems: "baseline",
-      gap: "0.5rem",
-    }}
-  >
-    £{overall_profit.toFixed(2)}
+        <div
+          style={{
+            ...numberStyle,
+            color: overall_profit >= 0 ? "green" : "red",
+            display: "flex",
+            alignItems: "baseline",
+            gap: "0.5rem",
+          }}
+        >
+          £{overall_profit.toFixed(2)}
 
-    {/* ⭐ ROI PERCENTAGE */}
-    {total_purchases > 0 && (
-      <span style={{ fontSize: "1.2rem", fontWeight: 600, color: "black" }}>
-        (
-        {((overall_profit / total_purchases) * 100).toFixed(2)}
-        %)
-      </span>
-    )}
-  </div>
-</div>
+          {/* ⭐ ROI PERCENTAGE */}
+          {total_purchases > 0 && (
+            <span style={{ fontSize: "1.2rem", fontWeight: 600, color: "black" }}>
+              ({((overall_profit / total_purchases) * 100).toFixed(2)}%)
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* KPI CARDS */}
       <div
@@ -96,10 +95,24 @@ export default async function OverallStatsPage() {
         </div>
       </div>
 
-      {/* PLAYER REWARDS COUNT */}
-      <div style={{ marginTop: "2rem", ...cardStyle }}>
-        <div>Total Player Rewards</div>
-        <div style={numberStyle}>{total_player_rewards}</div>
+      {/* ⭐ NEW ROW: CURRENT CARDS + PLAYER REWARDS */}
+      <div
+        style={{
+          marginTop: "2rem",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "1.5rem",
+        }}
+      >
+        <div style={cardStyle}>
+          <div>Total Current Cards</div>
+          <div style={numberStyle}>{total_current_cards}</div>
+        </div>
+
+        <div style={cardStyle}>
+          <div>Total Player Rewards</div>
+          <div style={numberStyle}>{total_player_rewards}</div>
+        </div>
       </div>
     </div>
   );
