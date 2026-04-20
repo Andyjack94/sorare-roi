@@ -1,7 +1,9 @@
 "use client";
 
-export default function RewardsTable({ data }) {
-  const extractYear = (competition) => {
+import { RewardRow } from "@/types/types";
+
+export default function RewardsTable({ data }: { data: RewardRow[] }) {
+  const extractYear = (competition: string): number => {
     if (!competition) return -1;
 
     const fourDigit = competition.match(/(20\d{2})$/);
@@ -45,7 +47,9 @@ export default function RewardsTable({ data }) {
         <thead>
           <tr style={{ borderBottom: "2px solid #eee" }}>
             <th style={{ textAlign: "left", padding: "0.5rem" }}>Competition</th>
-            <th style={{ textAlign: "left", padding: "0.5rem" }}>Total Rewards (£)</th>
+            <th style={{ textAlign: "left", padding: "0.5rem" }}>
+              Total Rewards (£)
+            </th>
           </tr>
         </thead>
 

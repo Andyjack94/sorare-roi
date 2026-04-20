@@ -10,9 +10,11 @@ import {
   Legend,
 } from "chart.js";
 
+import { ProfitRow } from "@/types/types";
+
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-export default function ProfitChart({ data }) {
+export default function ProfitChart({ data }: { data: ProfitRow[] }) {
   const labels = data.map((d) => d.competition);
   const values = data.map((d) => Number(d.gross_profit));
 
