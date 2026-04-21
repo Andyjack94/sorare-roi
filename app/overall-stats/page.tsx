@@ -1,4 +1,6 @@
 // SERVER COMPONENT
+export const dynamic = "force-dynamic";
+
 import { supabase } from "@/lib/supabaseClient";
 
 export default async function OverallStatsPage() {
@@ -18,7 +20,8 @@ export default async function OverallStatsPage() {
     total_player_rewards = 0,
     current_gallery_value = 0,
     overall_profit = 0,
-    total_current_cards = 0, // ⭐ NEW FIELD
+    total_current_cards = 0,
+    pl_on_card_purchases = 0, // ⭐ NEW FIELD
   } = data || {};
 
   const cardStyle = {
@@ -57,7 +60,6 @@ export default async function OverallStatsPage() {
         >
           £{overall_profit.toFixed(2)}
 
-          {/* ⭐ ROI PERCENTAGE */}
           {total_purchases > 0 && (
             <span style={{ fontSize: "1.2rem", fontWeight: 600, color: "black" }}>
               ({((overall_profit / total_purchases) * 100).toFixed(2)}%)
@@ -95,7 +97,7 @@ export default async function OverallStatsPage() {
         </div>
       </div>
 
-      {/* ⭐ NEW ROW: CURRENT CARDS + PLAYER REWARDS */}
+      {/* ⭐ CURRENT CARDS + PLAYER REWARDS */}
       <div
         style={{
           marginTop: "2rem",
@@ -112,6 +114,27 @@ export default async function OverallStatsPage() {
         <div style={cardStyle}>
           <div>Total Player Rewards</div>
           <div style={numberStyle}>{total_player_rewards}</div>
+        </div>
+      </div>
+
+      {/* ⭐ FINAL ROW: P/L ON CARD PURCHASES */}
+      <div
+        style={{
+          marginTop: "2rem",
+          display: "grid",
+          gridTemplateColumns: "1fr",
+        }}
+      >
+        <div style={cardStyle}>
+          <div>P/L on Card Purchases</div>
+          <div
+            style={{
+              ...numberStyle,
+              color: pl_on_card_purchases >= 0 ? "green" : "red",
+            }}
+          >
+            £{pl_on_card_purchases.toFixed(2)}
+          </div>
         </div>
       </div>
     </div>

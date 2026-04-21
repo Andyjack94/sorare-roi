@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { COMPETITIONS, SCARCITY } from "@/app/constants"; // ⭐ NEW IMPORT
 
 export default function InputsPage() {
   const [type, setType] = useState(""); // purchase | sale | reward
@@ -15,26 +16,6 @@ export default function InputsPage() {
   const [date, setDate] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
-
-  // ⭐ FULL COMPETITION LIST
-  const competitions = [
-    "All Star (Pre-2023)",
-    "Beat the Game Limited",
-    "Beat the Game Rare",
-    "Bundesliga 2026",
-    "Cap 240 Limited",
-    "Cap 240 Rare",
-    "Champion 24/25",
-    "Challenger 24/25",
-    "Challenger 2026",
-    "Contender 24/25",
-    "Eredivisie 2026",
-    "La Liga 2026",
-    "Ligue 1 2026",
-    "MLS 2026",
-    "MLS 2027",
-    "Premier League 2026",
-  ];
 
   const resetFields = () => {
     setPlayerName("");
@@ -83,12 +64,10 @@ export default function InputsPage() {
     resetFields();
     setType("");
 
-    // ⭐ Show success message
     setSuccessMessage("✔ Entry submitted successfully!");
     setTimeout(() => setSuccessMessage(""), 2500);
   };
 
-  // ⭐ Shared input style
   const inputStyle = {
     padding: "0.6rem",
     border: "1px solid #ccc",
@@ -98,7 +77,6 @@ export default function InputsPage() {
     background: "white",
   };
 
-  // ⭐ Shared button styles
   const buttonStyle = {
     padding: "0.7rem",
     background: "white",
@@ -115,7 +93,6 @@ export default function InputsPage() {
     cursor: "not-allowed",
   };
 
-  // ⭐ Validation logic per form type
   const isPurchaseValid =
     playerName && scarcity && competition && purchaseValue && date;
 
@@ -130,7 +107,6 @@ export default function InputsPage() {
         Inputs
       </h1>
 
-      {/* SUCCESS MESSAGE */}
       {successMessage && (
         <div
           style={{
@@ -147,7 +123,6 @@ export default function InputsPage() {
         </div>
       )}
 
-      {/* TYPE SELECTOR */}
       <select
         style={{ ...inputStyle, marginBottom: "1.5rem" }}
         value={type}
@@ -169,20 +144,28 @@ export default function InputsPage() {
             onChange={(e) => setPlayerName(e.target.value)}
           />
 
-          <input
+          {/* ⭐ SCARCITY DROPDOWN */}
+          <select
             style={inputStyle}
-            placeholder="Scarcity"
             value={scarcity}
             onChange={(e) => setScarcity(e.target.value)}
-          />
+          >
+            <option value="">Select Scarcity</option>
+            {SCARCITY.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
 
+          {/* COMPETITION */}
           <select
             style={inputStyle}
             value={competition}
             onChange={(e) => setCompetition(e.target.value)}
           >
             <option value="">Select Competition</option>
-            {competitions.map((c) => (
+            {COMPETITIONS.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -223,12 +206,19 @@ export default function InputsPage() {
             onChange={(e) => setPlayerName(e.target.value)}
           />
 
-          <input
+          {/* ⭐ SCARCITY DROPDOWN */}
+          <select
             style={inputStyle}
-            placeholder="Scarcity"
             value={scarcity}
             onChange={(e) => setScarcity(e.target.value)}
-          />
+          >
+            <option value="">Select Scarcity</option>
+            {SCARCITY.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
 
           <select
             style={inputStyle}
@@ -236,7 +226,7 @@ export default function InputsPage() {
             onChange={(e) => setCompetition(e.target.value)}
           >
             <option value="">Select Competition</option>
-            {competitions.map((c) => (
+            {COMPETITIONS.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -276,7 +266,7 @@ export default function InputsPage() {
             onChange={(e) => setCompetition(e.target.value)}
           >
             <option value="">Select Competition</option>
-            {competitions.map((c) => (
+            {COMPETITIONS.map((c) => (
               <option key={c} value={c}>
                 {c}
               </option>

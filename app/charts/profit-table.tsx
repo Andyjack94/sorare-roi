@@ -4,41 +4,66 @@ import { ProfitTableRow } from "@/types/types";
 
 export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
   // Extract year from competition string
-  const rows = data.map((row) => {
-    const match = row.competition.match(/(\d{4})/);
-    return {
-      ...row,
-      year: match ? Number(match[1]) : null,
-    };
-  });
+  const extractYear = (competition: string) => {
+    if (!competition) return null;
 
-  // Sort: newest year first, then alphabetical, then no-year at bottom
+    // Match 4-digit year at end (e.g., 2026)
+    const fourDigit = competition.match(/(20\d{2})$/);
+    if (fourDigit) return Number(fourDigit[1]);
+
+    // Match season format like 24/25 → treat as 2024
+    const season = competition.match(/(\d{2})\/\d{2}$/);
+    if (season) return Number("20" + season[1]);
+
+    return null; // No year found
+  };
+
+  const rows = data.map((row) => ({
+    ...row,
+    year: extractYear(row.competition),
+  }));
+
+  // Sorting rules:
+  // 1) "Non Card Entry" always last
+  // 2) Rows with year → newest year first, then alphabetical
+  // 3) Rows without year → alphabetical
   const sorted = rows.sort((a, b) => {
-    if (a.year && b.year) return b.year - a.year;
-    if (a.year && !b.year) return -1;
-    if (!a.year && b.year) return 1;
+    if (a.competition === "Non Card Entry") return 1;
+    if (b.competition === "Non Card Entry") return -1;
+
+    const yearA = a.year;
+    const yearB = b.year;
+
+    if (yearA !== null && yearB !== null) {
+      if (yearA !== yearB) return yearB - yearA;
+      return a.competition.localeCompare(b.competition);
+    }
+
+    if (yearA !== null && yearB === null) return -1;
+    if (yearA === null && yearB !== null) return 1;
+
     return a.competition.localeCompare(b.competition);
   });
+
+  const cell = { padding: "0.5rem", textAlign: "center" };
 
   return (
     <div>
       <h2 style={{ marginBottom: "1rem", color: "black" }}>Gross Profit Table</h2>
 
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
         <thead>
           <tr style={{ background: "#f3f4f6" }}>
-            <th style={{ padding: "0.5rem" }}>Competition</th>
-            <th style={{ padding: "0.5rem" }}>Year</th>
-            <th style={{ padding: "0.5rem" }}>Gross Profit (£)</th>
+            <th style={cell}>Competition</th>
+            <th style={cell}>Gross Profit (£)</th>
           </tr>
         </thead>
 
         <tbody>
           {sorted.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
-              <td style={{ padding: "0.5rem" }}>{row.competition}</td>
-              <td style={{ padding: "0.5rem" }}>{row.year ?? ""}</td>
-              <td style={{ padding: "0.5rem", fontWeight: 600 }}>
+              <td style={cell}>{row.competition}</td>
+              <td style={{ ...cell, fontWeight: 600 }}>
                 £{Number(row.gross_profit).toFixed(2)}
               </td>
             </tr>
