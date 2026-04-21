@@ -6,8 +6,8 @@ export type ProfitRow = {
 }
 
 export type ProfitTableRow = {
-  competition: string
-  gross_profit: number | string
+  competition: string | null
+  gross_profit: number | null
 }
 
 export type RewardRow = {
