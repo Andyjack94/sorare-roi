@@ -23,8 +23,8 @@ export default async function OverallStatsPage() {
   const total_current_cards = Number(data?.total_current_cards ?? 0);
   const pl_on_card_purchases = Number(data?.pl_on_card_purchases ?? 0);
 
-  // Withdrawals P/L
-  const pl_withdrawals = Number(data?.withdrawal ?? 0);
+  // Withdrawals P/L (safe cast to avoid TS errors)
+  const pl_withdrawals = Number((data as any)?.withdrawal ?? 0);
 
   // Scarcity counts
   const total_limited = Number(data?.total_limited ?? 0);
