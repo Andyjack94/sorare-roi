@@ -14,48 +14,42 @@ import { ProfitRow } from "@/types/types";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function ProfitChart({ data }: { data: ProfitRow[] }) {
-  // Extract year from competition string
-  const extractYear = (competition: string) => {
+  // Allow null competition safely
+  const extractYear = (competition: string | null) => {
     if (!competition) return -1;
 
-    // Match 4-digit year at end (e.g., 2026)
     const fourDigit = competition.match(/(20\d{2})$/);
     if (fourDigit) return Number(fourDigit[1]);
 
-    // Match season format like 24/25 → treat as 2024
     const season = competition.match(/(\d{2})\/\d{2}$/);
     if (season) return Number("20" + season[1]);
 
-    return -1; // No year found
+    return -1;
   };
 
-  // ⭐ SORTING LOGIC
   const sorted = [...data].sort((a, b) => {
-    // Force "Non Card Entry" to bottom
-    if (a.competition === "Non Card Entry") return 1;
-    if (b.competition === "Non Card Entry") return -1;
+    const compA = a.competition ?? "";
+    const compB = b.competition ?? "";
 
-    const yearA = extractYear(a.competition);
-    const yearB = extractYear(b.competition);
+    if (compA === "Non Card Entry") return 1;
+    if (compB === "Non Card Entry") return -1;
 
-    // If both have years → sort by year DESC
+    const yearA = extractYear(compA);
+    const yearB = extractYear(compB);
+
     if (yearA !== -1 && yearB !== -1) {
       if (yearA !== yearB) return yearB - yearA;
-      return a.competition.localeCompare(b.competition);
+      return compA.localeCompare(compB);
     }
 
-    // If only A has year → A comes first
     if (yearA !== -1 && yearB === -1) return -1;
-
-    // If only B has year → B comes first
     if (yearA === -1 && yearB !== -1) return 1;
 
-    // Neither has year → alphabetical
-    return a.competition.localeCompare(b.competition);
+    return compA.localeCompare(compB);
   });
 
-  const labels = sorted.map((d) => d.competition);
-  const values = sorted.map((d) => Number(d.gross_profit));
+  const labels = sorted.map((d) => d.competition ?? "Unknown");
+  const values = sorted.map((d) => Number(d.gross_profit ?? 0));
 
   const chartData = {
     labels,

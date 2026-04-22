@@ -3,30 +3,24 @@
 import { ProfitTableRow } from "@/types/types";
 
 export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
-  // Extract year from competition string
-  const extractYear = (competition: string) => {
+  // Allow null competition safely
+  const extractYear = (competition: string | null) => {
     if (!competition) return null;
 
-    // Match 4-digit year at end (e.g., 2026)
     const fourDigit = competition.match(/(20\d{2})$/);
     if (fourDigit) return Number(fourDigit[1]);
 
-    // Match season format like 24/25 → treat as 2024
     const season = competition.match(/(\d{2})\/\d{2}$/);
     if (season) return Number("20" + season[1]);
 
-    return null; // No year found
+    return null;
   };
 
   const rows = data.map((row) => ({
     ...row,
-    year: extractYear(row.competition),
+    year: extractYear(row.competition ?? null),
   }));
 
-  // Sorting rules:
-  // 1) "Non Card Entry" always last
-  // 2) Rows with year → newest year first, then alphabetical
-  // 3) Rows without year → alphabetical
   const sorted = rows.sort((a, b) => {
     if (a.competition === "Non Card Entry") return 1;
     if (b.competition === "Non Card Entry") return -1;
@@ -36,13 +30,13 @@ export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
 
     if (yearA !== null && yearB !== null) {
       if (yearA !== yearB) return yearB - yearA;
-      return a.competition.localeCompare(b.competition);
+      return (a.competition ?? "").localeCompare(b.competition ?? "");
     }
 
     if (yearA !== null && yearB === null) return -1;
     if (yearA === null && yearB !== null) return 1;
 
-    return a.competition.localeCompare(b.competition);
+    return (a.competition ?? "").localeCompare(b.competition ?? "");
   });
 
   const cell = { padding: "0.5rem", textAlign: "center" };
@@ -62,9 +56,9 @@ export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
         <tbody>
           {sorted.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
-              <td style={cell}>{row.competition}</td>
+              <td style={cell}>{row.competition ?? "Unknown"}</td>
               <td style={{ ...cell, fontWeight: 600 }}>
-                £{Number(row.gross_profit).toFixed(2)}
+                £{Number(row.gross_profit ?? 0).toFixed(2)}
               </td>
             </tr>
           ))}

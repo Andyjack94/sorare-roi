@@ -1,8 +1,8 @@
 // Shared types for charts, tables, rewards, and transactions
 
 export type ProfitRow = {
-  competition: string
-  gross_profit: number | string
+  competition: string | null
+  gross_profit: number | null
 }
 
 export type ProfitTableRow = {
