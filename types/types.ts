@@ -11,8 +11,8 @@ export type ProfitTableRow = {
 }
 
 export type RewardRow = {
-  competition: string
-  total_rewards: number | string
+  competition: string | null
+  total_rewards: number | null
 }
 
 // Matches your Supabase "transactions" table

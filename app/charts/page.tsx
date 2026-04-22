@@ -30,9 +30,9 @@ export default async function ChartsPage() {
       </h1>
 
       <div style={{ display: "grid", gap: "2rem" }}>
-        <ProfitTable data={competitionProfit || []} />
-        <ProfitChart data={competitionProfit || []} />
-        <RewardsTable data={rewardsData || []} />
+        <ProfitTable data={competitionProfit ?? []} />
+        <ProfitChart data={competitionProfit ?? []} />
+        <RewardsTable data={rewardsData ?? []} />
       </div>
     </div>
   );

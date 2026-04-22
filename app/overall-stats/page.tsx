@@ -13,16 +13,15 @@ export default async function OverallStatsPage() {
     console.error("Stats error:", error);
   }
 
-  const {
-    total_rewards = 0,
-    total_purchases = 0,
-    total_sales = 0,
-    total_player_rewards = 0,
-    current_gallery_value = 0,
-    overall_profit = 0,
-    total_current_cards = 0,
-    pl_on_card_purchases = 0, // ⭐ NEW FIELD
-  } = data || {};
+  // Safely coerce all values to numbers
+  const total_rewards = Number(data?.total_rewards ?? 0);
+  const total_purchases = Number(data?.total_purchases ?? 0);
+  const total_sales = Number(data?.total_sales ?? 0);
+  const total_player_rewards = Number(data?.total_player_rewards ?? 0);
+  const current_gallery_value = Number(data?.current_gallery_value ?? 0);
+  const overall_profit = Number(data?.overall_profit ?? 0);
+  const total_current_cards = Number(data?.total_current_cards ?? 0);
+  const pl_on_card_purchases = Number(data?.pl_on_card_purchases ?? 0);
 
   const cardStyle = {
     background: "white",

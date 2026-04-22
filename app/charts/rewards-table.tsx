@@ -1,13 +1,14 @@
 "use client";
 
+import React from "react";
 import { RewardRow } from "@/types/types";
 
 export default function RewardsTable({ data }: { data: RewardRow[] }) {
-  const cell = { padding: "0.5rem", textAlign: "center" };
+  const cell: React.CSSProperties = { padding: "0.5rem", textAlign: "center" };
 
   return (
     <div>
-      <h2 style={{ marginBottom: "1rem", color: "black" }}>Rewards by Competition</h2>
+      <h2 style={{ marginBottom: "1rem", color: "black" }}>Rewards Table</h2>
 
       <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
         <thead>
@@ -20,9 +21,9 @@ export default function RewardsTable({ data }: { data: RewardRow[] }) {
         <tbody>
           {data.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
-              <td style={cell}>{row.competition}</td>
-              <td style={{ ...cell, fontWeight: 600 }}>
-                £{Number(row.total_rewards).toFixed(2)}
+              <td style={cell}>{row.competition ?? "Unknown"}</td>
+              <td style={{ ...cell, fontWeight: 600 } as React.CSSProperties}>
+                £{Number(row.total_rewards ?? 0).toFixed(2)}
               </td>
             </tr>
           ))}

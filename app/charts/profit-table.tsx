@@ -1,6 +1,7 @@
 "use client";
 
 import { ProfitTableRow } from "@/types/types";
+import React from "react";
 
 export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
   const extractYear = (competition: string | null) => {
@@ -38,7 +39,7 @@ export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
     return (a.competition ?? "").localeCompare(b.competition ?? "");
   });
 
-  const cell = { padding: "0.5rem", textAlign: "center" };
+  const cell: React.CSSProperties = { padding: "0.5rem", textAlign: "center" };
 
   return (
     <div>
@@ -56,7 +57,7 @@ export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
           {sorted.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
               <td style={cell}>{row.competition ?? "Unknown"}</td>
-              <td style={{ ...cell, fontWeight: 600 }}>
+              <td style={{ ...cell, fontWeight: 600 } as React.CSSProperties}>
                 £{Number(row.gross_profit ?? 0).toFixed(2)}
               </td>
             </tr>
