@@ -3,7 +3,6 @@
 import { ProfitTableRow } from "@/types/types";
 
 export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
-  // Allow null competition safely
   const extractYear = (competition: string | null) => {
     if (!competition) return null;
 
