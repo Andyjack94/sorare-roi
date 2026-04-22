@@ -2,6 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { supabase } from "@/lib/supabaseClient";
+import type { CSSProperties } from "react";
 
 export default async function OverallStatsPage() {
   const { data, error } = await supabase
@@ -13,26 +14,27 @@ export default async function OverallStatsPage() {
     console.error("Stats error:", error);
   }
 
-  // Safely coerce all values to numbers
-  const total_rewards = Number(data?.total_rewards ?? 0);
-  const total_purchases = Number(data?.total_purchases ?? 0);
-  const total_sales = Number(data?.total_sales ?? 0);
-  const total_player_rewards = Number(data?.total_player_rewards ?? 0);
-  const current_gallery_value = Number(data?.current_gallery_value ?? 0);
-  const overall_profit = Number(data?.overall_profit ?? 0);
-  const total_current_cards = Number(data?.total_current_cards ?? 0);
-  const pl_on_card_purchases = Number(data?.pl_on_card_purchases ?? 0);
+  // Safely coerce all values to numbers (safe-cast version)
+  const total_rewards = Number((data as any)?.total_rewards ?? 0);
+  const total_purchases = Number((data as any)?.total_purchases ?? 0);
+  const total_sales = Number((data as any)?.total_sales ?? 0);
+  const total_player_rewards = Number((data as any)?.total_player_rewards ?? 0);
+  const current_gallery_value = Number((data as any)?.current_gallery_value ?? 0);
+  const overall_profit = Number((data as any)?.overall_profit ?? 0);
+  const total_current_cards = Number((data as any)?.total_current_cards ?? 0);
+  const pl_on_card_purchases = Number((data as any)?.pl_on_card_purchases ?? 0);
 
-  // Withdrawals P/L (safe cast to avoid TS errors)
+  // Withdrawals P/L
   const pl_withdrawals = Number((data as any)?.withdrawal ?? 0);
 
   // Scarcity counts
-  const total_limited = Number(data?.total_limited ?? 0);
-  const total_rare = Number(data?.total_rare ?? 0);
-  const total_super_rare = Number(data?.total_super_rare ?? 0);
-  const total_unique = Number(data?.total_unique ?? 0);
+  const total_limited = Number((data as any)?.total_limited ?? 0);
+  const total_rare = Number((data as any)?.total_rare ?? 0);
+  const total_super_rare = Number((data as any)?.total_super_rare ?? 0);
+  const total_unique = Number((data as any)?.total_unique ?? 0);
 
-  const cardStyle = {
+  // Typed styles
+  const cardStyle: CSSProperties = {
     background: "white",
     padding: "1.2rem",
     borderRadius: "8px",
@@ -41,7 +43,7 @@ export default async function OverallStatsPage() {
     textAlign: "center",
   };
 
-  const titleStyle = {
+  const titleStyle: CSSProperties = {
     minHeight: "2.2rem",
     display: "flex",
     alignItems: "center",
@@ -49,7 +51,7 @@ export default async function OverallStatsPage() {
     fontWeight: 500,
   };
 
-  const numberStyle = {
+  const numberStyle: CSSProperties = {
     fontSize: "1.8rem",
     fontWeight: 700,
     marginTop: "0.5rem",
@@ -119,7 +121,7 @@ export default async function OverallStatsPage() {
         </div>
       </div>
 
-      {/* ⭐ KPI CARDS — NOW FIT ON ONE LINE AND ALIGN NUMBERS */}
+      {/* ⭐ KPI CARDS */}
       <div
         style={{
           display: "grid",
