@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { COMPETITIONS, SCARCITY } from "@/app/constants"; // ⭐ NEW IMPORT
+import { COMPETITIONS, SCARCITY } from "@/app/constants";
 
 export default function InputsPage() {
-  const [type, setType] = useState(""); // purchase | sale | reward
+  const [type, setType] = useState(""); // purchase | sale | reward | deposit | withdrawal
 
   const [playerName, setPlayerName] = useState("");
   const [scarcity, setScarcity] = useState("");
@@ -13,7 +13,9 @@ export default function InputsPage() {
   const [purchaseValue, setPurchaseValue] = useState("");
   const [saleValue, setSaleValue] = useState("");
   const [rewardValue, setRewardValue] = useState("");
+  const [dwValue, setDwValue] = useState(""); // Deposit / Withdrawal
   const [date, setDate] = useState("");
+  const [cardId, setCardId] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -24,41 +26,77 @@ export default function InputsPage() {
     setPurchaseValue("");
     setSaleValue("");
     setRewardValue("");
+    setDwValue("");
     setDate("");
+    setCardId("");
   };
 
+  // ⭐⭐⭐ FULL DEBUGGING SUBMIT FUNCTION ⭐⭐⭐
   const submit = async () => {
     if (!type) return;
 
+    console.log("SUBMIT TYPE:", JSON.stringify(type));
+    console.log("DATE VALUE:", JSON.stringify(date));
+
+    let res;
+
     if (type === "purchase") {
-      await supabase.from("transactions").insert({
+      res = await supabase.from("transactions").insert({
         type: "purchase",
         player_name: playerName,
         scarcity,
         competition,
         purchase_value: Number(purchaseValue),
         date,
+        card_id: cardId,
       });
     }
 
     if (type === "sale") {
-      await supabase.from("transactions").insert({
+      res = await supabase.from("transactions").insert({
         type: "sale",
         player_name: playerName,
         scarcity,
         competition,
         sale_value: Number(saleValue),
         date,
+        card_id: cardId,
       });
     }
 
     if (type === "reward") {
-      await supabase.from("transactions").insert({
+      res = await supabase.from("transactions").insert({
         type: "reward",
         competition,
         sale_value: Number(rewardValue),
         date,
+        card_id: null,
       });
+    }
+
+    if (type === "deposit") {
+      res = await supabase.from("transactions").insert({
+        type: "deposit",
+        purchase_value: Number(dwValue),
+        date,
+        card_id: null,
+      });
+    }
+
+    if (type === "withdrawal") {
+      res = await supabase.from("transactions").insert({
+        type: "withdrawal",
+        purchase_value: Number(dwValue) * -1,
+        date,
+        card_id: null,
+      });
+    }
+
+    console.log("SUPABASE RESPONSE:", res);
+
+    if (res?.error) {
+      alert(`Supabase error: ${res.error.message}`);
+      return;
     }
 
     resetFields();
@@ -67,6 +105,7 @@ export default function InputsPage() {
     setSuccessMessage("✔ Entry submitted successfully!");
     setTimeout(() => setSuccessMessage(""), 2500);
   };
+  // ⭐⭐⭐ END SUBMIT ⭐⭐⭐
 
   const inputStyle = {
     padding: "0.6rem",
@@ -94,12 +133,15 @@ export default function InputsPage() {
   };
 
   const isPurchaseValid =
-    playerName && scarcity && competition && purchaseValue && date;
+    playerName && scarcity && competition && purchaseValue && date && cardId;
 
   const isSaleValid =
-    playerName && scarcity && competition && saleValue && date;
+    playerName && scarcity && competition && saleValue && date && cardId;
 
   const isRewardValid = competition && rewardValue && date;
+
+  const isDepositValid = dwValue && date;
+  const isWithdrawalValid = dwValue && date;
 
   return (
     <div style={{ padding: "2rem", background: "white", minHeight: "100vh" }}>
@@ -126,15 +168,20 @@ export default function InputsPage() {
       <select
         style={{ ...inputStyle, marginBottom: "1.5rem" }}
         value={type}
-        onChange={(e) => setType(e.target.value)}
+        onChange={(e) => {
+          setType(e.target.value.trim()); // ⭐ FIX
+          setDate(""); // reset date on type change
+        }}
       >
         <option value="">Select Type</option>
         <option value="purchase">Purchase</option>
         <option value="sale">Sale</option>
         <option value="reward">Reward</option>
+        <option value="deposit">Deposit</option>
+        <option value="withdrawal">Withdrawal</option>
       </select>
 
-      {/* PURCHASE FORM */}
+      {/* PURCHASE */}
       {type === "purchase" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <input
@@ -144,33 +191,38 @@ export default function InputsPage() {
             onChange={(e) => setPlayerName(e.target.value)}
           />
 
-          {/* ⭐ SCARCITY DROPDOWN */}
           <select
             style={inputStyle}
             value={scarcity}
             onChange={(e) => setScarcity(e.target.value)}
           >
             <option value="">Select Scarcity</option>
-            {SCARCITY.map((s) => (
+            {SCARCITY.map((s: string) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
           </select>
 
-          {/* COMPETITION */}
           <select
             style={inputStyle}
             value={competition}
             onChange={(e) => setCompetition(e.target.value)}
           >
             <option value="">Select Competition</option>
-            {COMPETITIONS.map((c) => (
+            {COMPETITIONS.map((c: string) => (
               <option key={c} value={c}>
                 {c}
               </option>
             ))}
           </select>
+
+          <input
+            style={inputStyle}
+            placeholder="Card ID"
+            value={cardId}
+            onChange={(e) => setCardId(e.target.value)}
+          />
 
           <input
             style={inputStyle}
@@ -196,7 +248,7 @@ export default function InputsPage() {
         </div>
       )}
 
-      {/* SALE FORM */}
+      {/* SALE */}
       {type === "sale" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <input
@@ -206,14 +258,13 @@ export default function InputsPage() {
             onChange={(e) => setPlayerName(e.target.value)}
           />
 
-          {/* ⭐ SCARCITY DROPDOWN */}
           <select
             style={inputStyle}
             value={scarcity}
             onChange={(e) => setScarcity(e.target.value)}
           >
             <option value="">Select Scarcity</option>
-            {SCARCITY.map((s) => (
+            {SCARCITY.map((s: string) => (
               <option key={s} value={s}>
                 {s}
               </option>
@@ -226,12 +277,19 @@ export default function InputsPage() {
             onChange={(e) => setCompetition(e.target.value)}
           >
             <option value="">Select Competition</option>
-            {COMPETITIONS.map((c) => (
+            {COMPETITIONS.map((c: string) => (
               <option key={c} value={c}>
                 {c}
               </option>
             ))}
           </select>
+
+          <input
+            style={inputStyle}
+            placeholder="Card ID"
+            value={cardId}
+            onChange={(e) => setCardId(e.target.value)}
+          />
 
           <input
             style={inputStyle}
@@ -257,7 +315,7 @@ export default function InputsPage() {
         </div>
       )}
 
-      {/* REWARD FORM */}
+      {/* REWARD */}
       {type === "reward" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
           <select
@@ -266,7 +324,7 @@ export default function InputsPage() {
             onChange={(e) => setCompetition(e.target.value)}
           >
             <option value="">Select Competition</option>
-            {COMPETITIONS.map((c) => (
+            {COMPETITIONS.map((c: string) => (
               <option key={c} value={c}>
                 {c}
               </option>
@@ -293,6 +351,60 @@ export default function InputsPage() {
             style={isRewardValid ? buttonStyle : disabledButtonStyle}
           >
             Submit Reward
+          </button>
+        </div>
+      )}
+
+      {/* DEPOSIT */}
+      {type === "deposit" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <input
+            style={inputStyle}
+            placeholder="Deposit Value (£)"
+            value={dwValue}
+            onChange={(e) => setDwValue(e.target.value)}
+          />
+
+          <input
+            style={inputStyle}
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+
+          <button
+            onClick={submit}
+            disabled={!isDepositValid}
+            style={isDepositValid ? buttonStyle : disabledButtonStyle}
+          >
+            Submit Deposit
+          </button>
+        </div>
+      )}
+
+      {/* WITHDRAWAL */}
+      {type === "withdrawal" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <input
+            style={inputStyle}
+            placeholder="Withdrawal Value (£)"
+            value={dwValue}
+            onChange={(e) => setDwValue(e.target.value)}
+          />
+
+          <input
+            style={inputStyle}
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+
+          <button
+            onClick={submit}
+            disabled={!isWithdrawalValid}
+            style={isWithdrawalValid ? buttonStyle : disabledButtonStyle}
+          >
+            Submit Withdrawal
           </button>
         </div>
       )}
