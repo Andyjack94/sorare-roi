@@ -9,7 +9,7 @@ export default function InputsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const editId = searchParams.get("id");
+  const editId = searchParams.get("id"); // string | null
   const isEditing = Boolean(editId);
 
   const [type, setType] = useState("");
@@ -24,9 +24,7 @@ export default function InputsPage() {
   const [cardId, setCardId] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // ---------------------------
   // PREFILL WHEN EDITING
-  // ---------------------------
   useEffect(() => {
     if (!isEditing) return;
 
@@ -42,9 +40,7 @@ export default function InputsPage() {
     setCardId(searchParams.get("card_id") || "");
   }, [isEditing, searchParams]);
 
-  // ---------------------------
   // RESET FIELDS
-  // ---------------------------
   const resetFields = () => {
     setPlayerName("");
     setScarcity("");
@@ -57,9 +53,7 @@ export default function InputsPage() {
     setCardId("");
   };
 
-  // ---------------------------
   // SUBMIT HANDLER
-  // ---------------------------
   const submit = async () => {
     if (!type) return;
 
@@ -67,13 +61,18 @@ export default function InputsPage() {
 
     if (isEditing) {
       // UPDATE EXISTING ROW
+      if (!editId) {
+        console.error("No editId provided for update");
+        return;
+      }
+
       const updateData: any = {
         type,
         player_name: playerName,
         scarcity,
         competition,
         date,
-        card_id: cardId || null,
+        card_id: cardId,
       };
 
       if (type === "purchase") updateData.purchase_value = Number(purchaseValue);
@@ -82,7 +81,10 @@ export default function InputsPage() {
       if (type === "deposit") updateData.purchase_value = Number(dwValue);
       if (type === "withdrawal") updateData.purchase_value = Number(dwValue) * -1;
 
-      res = await supabase.from("transactions").update(updateData).eq("id", editId);
+      res = await supabase
+        .from("transactions")
+        .update(updateData)
+        .eq("id", editId);
     } else {
       // INSERT NEW ROW
       if (type === "purchase") {
@@ -152,9 +154,7 @@ export default function InputsPage() {
     if (isEditing) router.push("/database");
   };
 
-  // ---------------------------
   // STYLES
-  // ---------------------------
   const inputStyle = {
     padding: "0.6rem",
     border: "1px solid #ccc",
@@ -180,9 +180,7 @@ export default function InputsPage() {
     cursor: "not-allowed",
   };
 
-  // ---------------------------
   // VALIDATION
-  // ---------------------------
   const isPurchaseValid =
     playerName && scarcity && competition && purchaseValue && date && cardId;
 
@@ -192,11 +190,10 @@ export default function InputsPage() {
   const isRewardValid = competition && rewardValue && date;
 
   const isDepositValid = dwValue && date;
+
   const isWithdrawalValid = dwValue && date;
 
-  // ---------------------------
   // RENDER
-  // ---------------------------
   return (
     <div style={{ padding: "2rem", background: "white", minHeight: "100vh" }}>
       <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1.5rem" }}>
