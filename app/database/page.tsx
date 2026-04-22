@@ -1,10 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
 import { TransactionRow } from '@/types/types';
 
 export default function DatabasePage() {
+  // Browser Supabase client
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // STATE
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [filters, setFilters] = useState<Record<string, string>>({
     date: '',
@@ -25,6 +32,7 @@ export default function DatabasePage() {
   const [page, setPage] = useState(1);
   const rowsPerPage = 50;
 
+  // LOAD DATA
   async function load() {
     const { data } = await supabase
       .from('transactions')
@@ -38,11 +46,13 @@ export default function DatabasePage() {
     load();
   }, []);
 
+  // FILTER HANDLER
   function handleFilterChange(column: string, value: string) {
     setFilters(prev => ({ ...prev, [column]: value }));
     setPage(1);
   }
 
+  // SORT HANDLER
   function handleSort(column: string) {
     if (sortColumn === column) {
       setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
@@ -52,6 +62,7 @@ export default function DatabasePage() {
     }
   }
 
+  // ADD PROFIT COLUMN
   const withProfit = transactions.map(t => ({
     ...t,
     profit:
@@ -60,6 +71,7 @@ export default function DatabasePage() {
         : '',
   }));
 
+  // FILTERING
   const filtered = withProfit.filter(t =>
     Object.keys(filters).every(key => {
       const filterValue = filters[key].toLowerCase();
@@ -68,6 +80,7 @@ export default function DatabasePage() {
     })
   );
 
+  // SORTING
   const sorted = [...filtered].sort((a, b) => {
     const valA = (a as any)[sortColumn] ?? '';
     const valB = (b as any)[sortColumn] ?? '';
@@ -79,14 +92,17 @@ export default function DatabasePage() {
     }
   });
 
+  // PAGINATION
   const totalPages = Math.ceil(sorted.length / rowsPerPage);
   const paginated = sorted.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
+  // DELETE
   async function handleDelete(id: string) {
     await supabase.from('transactions').delete().eq('id', id);
     load();
   }
 
+  // EDIT
   function handleEdit(row: TransactionRow) {
     const params = new URLSearchParams({
       id: row.id,
@@ -105,6 +121,7 @@ export default function DatabasePage() {
     window.location.href = `/inputs?${params.toString()}`;
   }
 
+  // RENDER
   return (
     <div>
       <h1>Database Review</h1>

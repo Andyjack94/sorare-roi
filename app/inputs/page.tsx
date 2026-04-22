@@ -1,19 +1,21 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
-export const revalidate = 0;
-
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
 import { COMPETITIONS, SCARCITY } from "@/app/constants";
 
 export default function InputsPage() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const editId = searchParams.get("id"); // string | null
+  const editId = searchParams.get("id");
   const isEditing = Boolean(editId);
 
   const [type, setType] = useState("");
@@ -64,11 +66,7 @@ export default function InputsPage() {
     let res;
 
     if (isEditing) {
-      // UPDATE EXISTING ROW
-      if (!editId) {
-        console.error("No editId provided for update");
-        return;
-      }
+      if (!editId) return;
 
       const updateData: any = {
         type,
@@ -85,12 +83,8 @@ export default function InputsPage() {
       if (type === "deposit") updateData.purchase_value = Number(dwValue);
       if (type === "withdrawal") updateData.purchase_value = Number(dwValue) * -1;
 
-      res = await supabase
-        .from("transactions")
-        .update(updateData)
-        .eq("id", editId);
+      res = await supabase.from("transactions").update(updateData).eq("id", editId);
     } else {
-      // INSERT NEW ROW
       if (type === "purchase") {
         res = await supabase.from("transactions").insert({
           type: "purchase",
