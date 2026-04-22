@@ -14,7 +14,6 @@ import { ProfitRow } from "@/types/types";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function ProfitChart({ data }: { data: ProfitRow[] }) {
-  // Allow null competition safely
   const extractYear = (competition: string | null) => {
     if (!competition) return -1;
 
