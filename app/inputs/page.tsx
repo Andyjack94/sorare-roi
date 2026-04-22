@@ -1,24 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { COMPETITIONS, SCARCITY } from "@/app/constants";
 
 export default function InputsPage() {
-  const [type, setType] = useState(""); // purchase | sale | reward | deposit | withdrawal
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
+  const editId = searchParams.get("id");
+  const isEditing = Boolean(editId);
+
+  const [type, setType] = useState("");
   const [playerName, setPlayerName] = useState("");
   const [scarcity, setScarcity] = useState("");
   const [competition, setCompetition] = useState("");
   const [purchaseValue, setPurchaseValue] = useState("");
   const [saleValue, setSaleValue] = useState("");
   const [rewardValue, setRewardValue] = useState("");
-  const [dwValue, setDwValue] = useState(""); // Deposit / Withdrawal
+  const [dwValue, setDwValue] = useState("");
   const [date, setDate] = useState("");
   const [cardId, setCardId] = useState("");
-
   const [successMessage, setSuccessMessage] = useState("");
 
+  // ---------------------------
+  // PREFILL WHEN EDITING
+  // ---------------------------
+  useEffect(() => {
+    if (!isEditing) return;
+
+    setType(searchParams.get("type") || "");
+    setPlayerName(searchParams.get("player_name") || "");
+    setScarcity(searchParams.get("scarcity") || "");
+    setCompetition(searchParams.get("competition") || "");
+    setPurchaseValue(searchParams.get("purchase_value") || "");
+    setSaleValue(searchParams.get("sale_value") || "");
+    setRewardValue(searchParams.get("reward_value") || "");
+    setDwValue(searchParams.get("dwValue") || "");
+    setDate(searchParams.get("date") || "");
+    setCardId(searchParams.get("card_id") || "");
+  }, [isEditing, searchParams]);
+
+  // ---------------------------
+  // RESET FIELDS
+  // ---------------------------
   const resetFields = () => {
     setPlayerName("");
     setScarcity("");
@@ -31,68 +57,86 @@ export default function InputsPage() {
     setCardId("");
   };
 
-  // ⭐⭐⭐ FULL DEBUGGING SUBMIT FUNCTION ⭐⭐⭐
+  // ---------------------------
+  // SUBMIT HANDLER
+  // ---------------------------
   const submit = async () => {
     if (!type) return;
 
-    console.log("SUBMIT TYPE:", JSON.stringify(type));
-    console.log("DATE VALUE:", JSON.stringify(date));
-
     let res;
 
-    if (type === "purchase") {
-      res = await supabase.from("transactions").insert({
-        type: "purchase",
+    if (isEditing) {
+      // UPDATE EXISTING ROW
+      const updateData: any = {
+        type,
         player_name: playerName,
         scarcity,
         competition,
-        purchase_value: Number(purchaseValue),
         date,
-        card_id: cardId,
-      });
-    }
+        card_id: cardId || null,
+      };
 
-    if (type === "sale") {
-      res = await supabase.from("transactions").insert({
-        type: "sale",
-        player_name: playerName,
-        scarcity,
-        competition,
-        sale_value: Number(saleValue),
-        date,
-        card_id: cardId,
-      });
-    }
+      if (type === "purchase") updateData.purchase_value = Number(purchaseValue);
+      if (type === "sale") updateData.sale_value = Number(saleValue);
+      if (type === "reward") updateData.sale_value = Number(rewardValue);
+      if (type === "deposit") updateData.purchase_value = Number(dwValue);
+      if (type === "withdrawal") updateData.purchase_value = Number(dwValue) * -1;
 
-    if (type === "reward") {
-      res = await supabase.from("transactions").insert({
-        type: "reward",
-        competition,
-        sale_value: Number(rewardValue),
-        date,
-        card_id: null,
-      });
-    }
+      res = await supabase.from("transactions").update(updateData).eq("id", editId);
+    } else {
+      // INSERT NEW ROW
+      if (type === "purchase") {
+        res = await supabase.from("transactions").insert({
+          type: "purchase",
+          player_name: playerName,
+          scarcity,
+          competition,
+          purchase_value: Number(purchaseValue),
+          date,
+          card_id: cardId,
+        });
+      }
 
-    if (type === "deposit") {
-      res = await supabase.from("transactions").insert({
-        type: "deposit",
-        purchase_value: Number(dwValue),
-        date,
-        card_id: null,
-      });
-    }
+      if (type === "sale") {
+        res = await supabase.from("transactions").insert({
+          type: "sale",
+          player_name: playerName,
+          scarcity,
+          competition,
+          sale_value: Number(saleValue),
+          date,
+          card_id: cardId,
+        });
+      }
 
-    if (type === "withdrawal") {
-      res = await supabase.from("transactions").insert({
-        type: "withdrawal",
-        purchase_value: Number(dwValue) * -1,
-        date,
-        card_id: null,
-      });
-    }
+      if (type === "reward") {
+        res = await supabase.from("transactions").insert({
+          type: "reward",
+          competition,
+          sale_value: Number(rewardValue),
+          date,
+          card_id: null,
+        });
+      }
 
-    console.log("SUPABASE RESPONSE:", res);
+      if (type === "deposit") {
+        res = await supabase.from("transactions").insert({
+          type: "deposit",
+          purchase_value: Number(dwValue),
+          date,
+          card_id: null,
+        });
+      }
+
+      if (type === "withdrawal") {
+        res = await supabase.from("transactions").insert({
+          type: "withdrawal",
+          purchase_value: Number(dwValue) * -1,
+          date,
+          card_id: null,
+        });
+      }
+    }
 
     if (res?.error) {
       alert(`Supabase error: ${res.error.message}`);
@@ -102,11 +146,15 @@ export default function InputsPage() {
     resetFields();
     setType("");
 
-    setSuccessMessage("✔ Entry submitted successfully!");
+    setSuccessMessage(isEditing ? "Entry updated!" : "Entry submitted!");
     setTimeout(() => setSuccessMessage(""), 2500);
-  };
-  // ⭐⭐⭐ END SUBMIT ⭐⭐⭐
 
+    if (isEditing) router.push("/database");
+  };
+
+  // ---------------------------
+  // STYLES
+  // ---------------------------
   const inputStyle = {
     padding: "0.6rem",
     border: "1px solid #ccc",
@@ -132,6 +180,9 @@ export default function InputsPage() {
     cursor: "not-allowed",
   };
 
+  // ---------------------------
+  // VALIDATION
+  // ---------------------------
   const isPurchaseValid =
     playerName && scarcity && competition && purchaseValue && date && cardId;
 
@@ -143,10 +194,13 @@ export default function InputsPage() {
   const isDepositValid = dwValue && date;
   const isWithdrawalValid = dwValue && date;
 
+  // ---------------------------
+  // RENDER
+  // ---------------------------
   return (
     <div style={{ padding: "2rem", background: "white", minHeight: "100vh" }}>
       <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1.5rem" }}>
-        Inputs
+        {isEditing ? "Edit Entry" : "Inputs"}
       </h1>
 
       {successMessage && (
@@ -165,13 +219,11 @@ export default function InputsPage() {
         </div>
       )}
 
+      {/* TYPE SELECTOR */}
       <select
         style={{ ...inputStyle, marginBottom: "1.5rem" }}
         value={type}
-        onChange={(e) => {
-          setType(e.target.value.trim()); // ⭐ FIX
-          setDate(""); // reset date on type change
-        }}
+        onChange={(e) => setType(e.target.value.trim())}
       >
         <option value="">Select Type</option>
         <option value="purchase">Purchase</option>
@@ -243,7 +295,7 @@ export default function InputsPage() {
             disabled={!isPurchaseValid}
             style={isPurchaseValid ? buttonStyle : disabledButtonStyle}
           >
-            Submit Purchase
+            {isEditing ? "Update Purchase" : "Submit Purchase"}
           </button>
         </div>
       )}
@@ -310,7 +362,7 @@ export default function InputsPage() {
             disabled={!isSaleValid}
             style={isSaleValid ? buttonStyle : disabledButtonStyle}
           >
-            Submit Sale
+            {isEditing ? "Update Sale" : "Submit Sale"}
           </button>
         </div>
       )}
@@ -350,7 +402,7 @@ export default function InputsPage() {
             disabled={!isRewardValid}
             style={isRewardValid ? buttonStyle : disabledButtonStyle}
           >
-            Submit Reward
+            {isEditing ? "Update Reward" : "Submit Reward"}
           </button>
         </div>
       )}
@@ -377,7 +429,7 @@ export default function InputsPage() {
             disabled={!isDepositValid}
             style={isDepositValid ? buttonStyle : disabledButtonStyle}
           >
-            Submit Deposit
+            {isEditing ? "Update Deposit" : "Submit Deposit"}
           </button>
         </div>
       )}
@@ -404,7 +456,7 @@ export default function InputsPage() {
             disabled={!isWithdrawalValid}
             style={isWithdrawalValid ? buttonStyle : disabledButtonStyle}
           >
-            Submit Withdrawal
+            {isEditing ? "Update Withdrawal" : "Submit Withdrawal"}
           </button>
         </div>
       )}

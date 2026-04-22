@@ -6,7 +6,6 @@ import { TransactionRow } from '@/types/types';
 
 export default function DatabasePage() {
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
-
   const [filters, setFilters] = useState<Record<string, string>>({
     date: '',
     sale_date: '',
@@ -23,7 +22,6 @@ export default function DatabasePage() {
 
   const [sortColumn, setSortColumn] = useState<string>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-
   const [page, setPage] = useState(1);
   const rowsPerPage = 50;
 
@@ -54,7 +52,6 @@ export default function DatabasePage() {
     }
   }
 
-  // Add profit to each row
   const withProfit = transactions.map(t => ({
     ...t,
     profit:
@@ -91,8 +88,21 @@ export default function DatabasePage() {
   }
 
   function handleEdit(row: TransactionRow) {
-    const params = new URLSearchParams(row as any).toString();
-    window.location.href = `/inputs?${params}`;
+    const params = new URLSearchParams({
+      id: row.id,
+      type: row.type ?? '',
+      player_name: row.player_name ?? '',
+      scarcity: row.scarcity ?? '',
+      competition: row.competition ?? '',
+      purchase_value: row.purchase_value?.toString() ?? '',
+      sale_value: row.sale_value?.toString() ?? '',
+      date: row.date ?? '',
+      sale_date: row.sale_date ?? '',
+      card_id: row.card_id ?? '',
+      notes: row.notes ?? '',
+    });
+
+    window.location.href = `/inputs?${params.toString()}`;
   }
 
   return (
@@ -133,10 +143,8 @@ export default function DatabasePage() {
             ))}
           </tr>
 
-          {/* FILTER ROW */}
           <tr style={{ background: '#fafafa' }}>
             <td></td>
-
             {Object.keys(filters).map(key => (
               <td key={key} style={{ padding: '0.3rem' }}>
                 <input
@@ -225,7 +233,6 @@ export default function DatabasePage() {
         </tbody>
       </table>
 
-      {/* PAGINATION */}
       <div
         style={{
           marginTop: '1rem',

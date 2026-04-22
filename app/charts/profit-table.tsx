@@ -4,6 +4,11 @@ import { ProfitTableRow } from "@/types/types";
 import React from "react";
 
 export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
+  // Remove rows with null/empty competition
+  const filtered = data.filter(
+    (row) => row.competition && row.competition.trim() !== ""
+  );
+
   const extractYear = (competition: string | null) => {
     if (!competition) return null;
 
@@ -16,7 +21,7 @@ export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
     return null;
   };
 
-  const rows = data.map((row) => ({
+  const rows = filtered.map((row) => ({
     ...row,
     year: extractYear(row.competition ?? null),
   }));
@@ -56,7 +61,7 @@ export default function ProfitTable({ data }: { data: ProfitTableRow[] }) {
         <tbody>
           {sorted.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
-              <td style={cell}>{row.competition ?? "Unknown"}</td>
+              <td style={cell}>{row.competition}</td>
               <td style={{ ...cell, fontWeight: 600 } as React.CSSProperties}>
                 £{Number(row.gross_profit ?? 0).toFixed(2)}
               </td>

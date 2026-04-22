@@ -14,6 +14,11 @@ import { ProfitRow } from "@/types/types";
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function ProfitChart({ data }: { data: ProfitRow[] }) {
+  // Remove rows with null/empty competition
+  const filtered = data.filter(
+    (row) => row.competition && row.competition.trim() !== ""
+  );
+
   const extractYear = (competition: string | null) => {
     if (!competition) return -1;
 
@@ -26,7 +31,7 @@ export default function ProfitChart({ data }: { data: ProfitRow[] }) {
     return -1;
   };
 
-  const sorted = [...data].sort((a, b) => {
+  const sorted = [...filtered].sort((a, b) => {
     const compA = a.competition ?? "";
     const compB = b.competition ?? "";
 
@@ -47,7 +52,7 @@ export default function ProfitChart({ data }: { data: ProfitRow[] }) {
     return compA.localeCompare(compB);
   });
 
-  const labels = sorted.map((d) => d.competition ?? "Unknown");
+  const labels = sorted.map((d) => d.competition);
   const values = sorted.map((d) => Number(d.gross_profit ?? 0));
 
   const chartData = {
