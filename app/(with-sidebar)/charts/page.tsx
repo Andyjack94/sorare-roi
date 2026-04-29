@@ -9,8 +9,9 @@ import RewardsTable from "./rewards-table";
 export default async function ChartsPage() {
   // Fetch at runtime (NOT during build)
   const { data: competitionProfit } = await supabase
-    .from("competition_gross_profit")
-    .select("*");
+  .from("competition_gross_profit")
+  .select("*");
+
 
   const { data: rewardsData } = await supabase
     .from("competition_rewards")

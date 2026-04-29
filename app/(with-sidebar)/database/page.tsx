@@ -5,14 +5,15 @@ import { createClient } from '@supabase/supabase-js';
 import { TransactionRow } from '@/types/types';
 
 export default function DatabasePage() {
-  // Browser Supabase client
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
   // STATE
-  const [transactions, setTransactions] = useState<TransactionRow[]>([]);
+  const [rows, setRows] = useState<TransactionRow[]>([]);
+  const [totalRows, setTotalRows] = useState(0);
+
   const [filters, setFilters] = useState<Record<string, string>>({
     date: '',
     sale_date: '',
@@ -23,28 +24,42 @@ export default function DatabasePage() {
     competition: '',
     purchase_value: '',
     sale_value: '',
-    profit: '',
     notes: '',
   });
 
-  const [sortColumn, setSortColumn] = useState<string>('date');
+  const [sortColumn, setSortColumn] = useState('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
   const [page, setPage] = useState(1);
   const rowsPerPage = 50;
 
-  // LOAD DATA
+  // LOAD DATA (SERVER-SIDE PAGINATION)
   async function load() {
-    const { data } = await supabase
-      .from('transactions')
-      .select('*')
-      .order('date', { ascending: false });
+    const from = (page - 1) * rowsPerPage;
+    const to = from + rowsPerPage - 1;
 
-    setTransactions((data as TransactionRow[]) || []);
+    let query = supabase
+      .from('transactions')
+      .select('*', { count: 'exact' })
+      .order(sortColumn, { ascending: sortDirection === 'asc' })
+      .range(from, to);
+
+    // APPLY FILTERS
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value.trim() !== '') {
+        query = query.ilike(key, `%${value}%`);
+      }
+    });
+
+    const { data, count } = await query;
+
+    setRows(data || []);
+    setTotalRows(count || 0);
   }
 
   useEffect(() => {
     load();
-  }, []);
+  }, [page, sortColumn, sortDirection, filters]);
 
   // FILTER HANDLER
   function handleFilterChange(column: string, value: string) {
@@ -61,40 +76,6 @@ export default function DatabasePage() {
       setSortDirection('asc');
     }
   }
-
-  // ADD PROFIT COLUMN
-  const withProfit = transactions.map(t => ({
-    ...t,
-    profit:
-      t.sale_value && t.purchase_value
-        ? Number(t.sale_value) - Number(t.purchase_value)
-        : '',
-  }));
-
-  // FILTERING
-  const filtered = withProfit.filter(t =>
-    Object.keys(filters).every(key => {
-      const filterValue = filters[key].toLowerCase();
-      if (!filterValue) return true;
-      return String((t as any)[key] ?? '').toLowerCase().includes(filterValue);
-    })
-  );
-
-  // SORTING
-  const sorted = [...filtered].sort((a, b) => {
-    const valA = (a as any)[sortColumn] ?? '';
-    const valB = (b as any)[sortColumn] ?? '';
-
-    if (sortDirection === 'asc') {
-      return String(valA).localeCompare(String(valB), undefined, { numeric: true });
-    } else {
-      return String(valB).localeCompare(String(valA), undefined, { numeric: true });
-    }
-  });
-
-  // PAGINATION
-  const totalPages = Math.ceil(sorted.length / rowsPerPage);
-  const paginated = sorted.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   // DELETE
   async function handleDelete(id: string) {
@@ -121,7 +102,8 @@ export default function DatabasePage() {
     window.location.href = `/inputs?${params.toString()}`;
   }
 
-  // RENDER
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+
   return (
     <div>
       <h1>Database Review</h1>
@@ -141,7 +123,6 @@ export default function DatabasePage() {
               { key: 'competition', label: 'Competition' },
               { key: 'purchase_value', label: 'Purchase Value (£)' },
               { key: 'sale_value', label: 'Sale Value (£)' },
-              { key: 'profit', label: 'Profit (£)' },
               { key: 'notes', label: 'Notes' },
             ].map(col => (
               <th
@@ -182,7 +163,7 @@ export default function DatabasePage() {
         </thead>
 
         <tbody>
-          {paginated.map((t, i) => (
+          {rows.map((t, i) => (
             <tr key={t.id} style={{ background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
               <td style={{ padding: '0.5rem', whiteSpace: 'nowrap' }}>
                 <button
@@ -224,26 +205,8 @@ export default function DatabasePage() {
               <td style={{ padding: '0.5rem' }}>{t.player_name}</td>
               <td style={{ padding: '0.5rem' }}>{t.scarcity}</td>
               <td style={{ padding: '0.5rem' }}>{t.competition}</td>
-
-              <td style={{ padding: '0.5rem' }}>
-                {t.purchase_value ? Number(t.purchase_value).toFixed(2) : ''}
-              </td>
-
-              <td style={{ padding: '0.5rem' }}>
-                {t.sale_value ? Number(t.sale_value).toFixed(2) : ''}
-              </td>
-
-              <td
-                style={{
-                  padding: '0.5rem',
-                  color:
-                    (t as any).profit > 0 ? 'green' : (t as any).profit < 0 ? 'red' : 'inherit',
-                  fontWeight: (t as any).profit ? 600 : 400,
-                }}
-              >
-                {(t as any).profit !== '' ? Number((t as any).profit).toFixed(2) : ''}
-              </td>
-
+              <td style={{ padding: '0.5rem' }}>{t.purchase_value}</td>
+              <td style={{ padding: '0.5rem' }}>{t.sale_value}</td>
               <td style={{ padding: '0.5rem' }}>{t.notes}</td>
             </tr>
           ))}
@@ -268,7 +231,6 @@ export default function DatabasePage() {
             color: 'white',
             border: 'none',
             borderRadius: 4,
-            cursor: page === 1 ? 'default' : 'pointer',
           }}
         >
           Previous
@@ -287,7 +249,6 @@ export default function DatabasePage() {
             color: 'white',
             border: 'none',
             borderRadius: 4,
-            cursor: page === totalPages ? 'default' : 'pointer',
           }}
         >
           Next
