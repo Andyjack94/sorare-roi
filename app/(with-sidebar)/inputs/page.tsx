@@ -11,7 +11,6 @@ export default function InputsPage() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -30,7 +29,6 @@ export default function InputsPage() {
   const [cardId, setCardId] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // PREFILL WHEN EDITING
   useEffect(() => {
     if (!isEditing) return;
 
@@ -46,7 +44,6 @@ export default function InputsPage() {
     setCardId(searchParams.get("card_id") || "");
   }, [isEditing, searchParams]);
 
-  // RESET FIELDS
   const resetFields = () => {
     setPlayerName("");
     setScarcity("");
@@ -59,7 +56,6 @@ export default function InputsPage() {
     setCardId("");
   };
 
-  // SUBMIT HANDLER
   const submit = async () => {
     if (!type) return;
 
@@ -145,40 +141,48 @@ export default function InputsPage() {
 
     resetFields();
     setType("");
-
     setSuccessMessage(isEditing ? "Entry updated!" : "Entry submitted!");
     setTimeout(() => setSuccessMessage(""), 2500);
 
     if (isEditing) router.push("/database");
   };
 
-  // STYLES
-  const inputStyle = {
-    padding: "0.6rem",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
-    fontSize: "1rem",
-    color: "black",
-    background: "white",
+  const inputStyle: React.CSSProperties = {
+    padding: "0.9rem 1rem",
+    border: "1px solid #475569",
+    borderRadius: "8px",
+    fontSize: "1.1rem",
+    color: "white",
+    background: "#1e293b",
+    width: "100%",
   };
 
-  const buttonStyle = {
-    padding: "0.7rem",
-    background: "white",
-    color: "black",
-    border: "2px solid black",
-    borderRadius: "6px",
-    fontSize: "1rem",
+  const dropdownStyle: React.CSSProperties = {
+    ...inputStyle,
+    backgroundImage:
+      "url(\"data:image/svg+xml;utf8,<svg fill='white' height='20' width='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><polygon points='0,0 20,0 10,12'/></svg>\")",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "right 1rem center",
+    backgroundSize: "14px",
+  };
+
+  const buttonStyle: React.CSSProperties = {
+    padding: "1rem",
+    background: "#3b82f6",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "1.1rem",
     cursor: "pointer",
+    fontWeight: 600,
   };
 
-  const disabledButtonStyle = {
+  const disabledButtonStyle: React.CSSProperties = {
     ...buttonStyle,
     opacity: 0.4,
     cursor: "not-allowed",
   };
 
-  // VALIDATION
   const isPurchaseValid =
     playerName && scarcity && competition && purchaseValue && date && cardId;
 
@@ -186,15 +190,49 @@ export default function InputsPage() {
     playerName && scarcity && competition && saleValue && date && cardId;
 
   const isRewardValid = competition && rewardValue && date;
-
   const isDepositValid = dwValue && date;
-
   const isWithdrawalValid = dwValue && date;
 
-  // RENDER
+  const typeButton = (value: string, label: string) => (
+    <button
+      key={value}
+      onClick={() => setType(value)}
+      style={{
+        padding: "1rem 1.4rem",
+        borderRadius: "10px",
+        border: type === value ? "2px solid #3b82f6" : "1px solid #475569",
+        background: type === value ? "#1e40af" : "#1e293b",
+        color: "white",
+        fontSize: "1.1rem",
+        fontWeight: 600,
+        cursor: "pointer",
+        transition: "0.15s",
+        minWidth: "140px",
+        textAlign: "center",
+      }}
+    >
+      {label}
+    </button>
+  );
+
   return (
-    <div style={{ padding: "2rem", background: "white", minHeight: "100vh" }}>
-      <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "1.5rem" }}>
+    <div
+      className="inputs-page"
+      style={{
+        padding: "2rem",
+        background: "#0f172a",
+        minHeight: "100vh",
+        color: "white",
+      }}
+    >
+      <h1
+        style={{
+          fontSize: "2rem",
+          fontWeight: 700,
+          marginBottom: "1.5rem",
+          textAlign: "center",
+        }}
+      >
         {isEditing ? "Edit Entry" : "Inputs"}
       </h1>
 
@@ -203,34 +241,36 @@ export default function InputsPage() {
           style={{
             marginBottom: "1rem",
             padding: "0.8rem",
-            background: "#d1fae5",
-            border: "1px solid #10b981",
+            background: "#1e293b",
+            border: "1px solid #334155",
             borderRadius: "6px",
-            color: "#065f46",
+            color: "#22c55e",
             fontWeight: 600,
+            textAlign: "center",
           }}
         >
           {successMessage}
         </div>
       )}
 
-      {/* TYPE SELECTOR */}
-      <select
-        style={{ ...inputStyle, marginBottom: "1.5rem" }}
-        value={type}
-        onChange={(e) => setType(e.target.value.trim())}
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          marginBottom: "2rem",
+          flexWrap: "wrap",
+          justifyContent: "center",
+        }}
       >
-        <option value="">Select Type</option>
-        <option value="purchase">Purchase</option>
-        <option value="sale">Sale</option>
-        <option value="reward">Reward</option>
-        <option value="deposit">Deposit</option>
-        <option value="withdrawal">Withdrawal</option>
-      </select>
+        {typeButton("purchase", "Purchase")}
+        {typeButton("sale", "Sale")}
+        {typeButton("reward", "Reward")}
+        {typeButton("deposit", "Deposit")}
+        {typeButton("withdrawal", "Withdrawal")}
+      </div>
 
-      {/* PURCHASE */}
       {type === "purchase" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           <input
             style={inputStyle}
             placeholder="Player Name"
@@ -239,7 +279,7 @@ export default function InputsPage() {
           />
 
           <select
-            style={inputStyle}
+            style={dropdownStyle}
             value={scarcity}
             onChange={(e) => setScarcity(e.target.value)}
           >
@@ -252,7 +292,7 @@ export default function InputsPage() {
           </select>
 
           <select
-            style={inputStyle}
+            style={dropdownStyle}
             value={competition}
             onChange={(e) => setCompetition(e.target.value)}
           >
@@ -295,9 +335,8 @@ export default function InputsPage() {
         </div>
       )}
 
-      {/* SALE */}
       {type === "sale" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           <input
             style={inputStyle}
             placeholder="Player Name"
@@ -306,7 +345,7 @@ export default function InputsPage() {
           />
 
           <select
-            style={inputStyle}
+            style={dropdownStyle}
             value={scarcity}
             onChange={(e) => setScarcity(e.target.value)}
           >
@@ -319,7 +358,7 @@ export default function InputsPage() {
           </select>
 
           <select
-            style={inputStyle}
+            style={dropdownStyle}
             value={competition}
             onChange={(e) => setCompetition(e.target.value)}
           >
@@ -362,11 +401,10 @@ export default function InputsPage() {
         </div>
       )}
 
-      {/* REWARD */}
       {type === "reward" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           <select
-            style={inputStyle}
+            style={dropdownStyle}
             value={competition}
             onChange={(e) => setCompetition(e.target.value)}
           >
@@ -402,9 +440,8 @@ export default function InputsPage() {
         </div>
       )}
 
-      {/* DEPOSIT */}
       {type === "deposit" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           <input
             style={inputStyle}
             placeholder="Deposit Value (£)"
@@ -429,9 +466,8 @@ export default function InputsPage() {
         </div>
       )}
 
-      {/* WITHDRAWAL */}
       {type === "withdrawal" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           <input
             style={inputStyle}
             placeholder="Withdrawal Value (£)"

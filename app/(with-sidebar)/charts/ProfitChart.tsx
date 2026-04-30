@@ -8,13 +8,13 @@ import {
   LinearScale,
   Tooltip,
   Legend,
+  Title,
 } from "chart.js";
 import { ProfitRow } from "@/types/types";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
 export default function ProfitChart({ data }: { data: ProfitRow[] }) {
-  // Remove rows with null/empty competition
   const filtered = data.filter(
     (row) => row.competition && row.competition.trim() !== ""
   );
@@ -66,12 +66,66 @@ export default function ProfitChart({ data }: { data: ProfitRow[] }) {
     ],
   };
 
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        labels: {
+          color: "white",
+        },
+      },
+      tooltip: {
+        titleColor: "white",
+        bodyColor: "white",
+        backgroundColor: "#1e293b",
+        borderColor: "#334155",
+        borderWidth: 1,
+        callbacks: {
+          label: function (context: any) {
+            return "£" + context.raw;
+          },
+        },
+      },
+      title: {
+        display: true,
+        text: "Gross Profit by Competition",
+        color: "white",
+        font: {
+          size: 18,
+          weight: 700, // ⭐ FIXED (was "bold")
+        },
+        padding: {
+          top: 10,
+          bottom: 20,
+        },
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: "white",
+        },
+        grid: {
+          color: "#334155",
+        },
+      },
+      y: {
+        ticks: {
+          color: "white",
+          callback: function (value: number | string) {
+            return "£" + value;
+          },
+        },
+        grid: {
+          color: "#334155",
+        },
+      },
+    },
+  };
+
   return (
     <div>
-      <h2 style={{ marginBottom: "1rem", color: "black" }}>
-        Gross Profit by Competition
-      </h2>
-      <Bar data={chartData} />
+      <Bar data={chartData} options={options} />
     </div>
   );
 }

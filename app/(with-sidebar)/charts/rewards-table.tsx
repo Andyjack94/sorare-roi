@@ -8,21 +8,44 @@ export default function RewardsTable({ data }: { data: RewardRow[] }) {
 
   return (
     <div>
-      <h2 style={{ marginBottom: "1rem", color: "black" }}>Rewards Table</h2>
+      {/* Updated title */}
+      <h2
+        style={{
+          marginBottom: "1rem",
+          color: "white",
+          textAlign: "center",
+          fontSize: "1.4rem",
+          fontWeight: 700,
+        }}
+      >
+        Rewards Table
+      </h2>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          textAlign: "center",
+        }}
+      >
         <thead>
-          <tr style={{ background: "#f3f4f6" }}>
-            <th style={cell}>Competition</th>
-            <th style={cell}>Total Rewards (£)</th>
+          <tr style={{ background: "#273449" }}>
+            <th style={{ ...cell, color: "white" }}>Competition</th>
+            <th style={{ ...cell, color: "white" }}>Total Rewards (£)</th>
           </tr>
         </thead>
 
         <tbody>
           {data.map((row, i) => (
-            <tr key={i} style={{ background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
+            <tr
+              key={i}
+              style={{
+                background: i % 2 === 0 ? "#1a2433" : "#16202c",
+                color: "white",
+              }}
+            >
               <td style={cell}>{row.competition ?? "Unknown"}</td>
-              <td style={{ ...cell, fontWeight: 600 } as React.CSSProperties}>
+              <td style={{ ...cell, fontWeight: 600 }}>
                 £{Number(row.total_rewards ?? 0).toFixed(2)}
               </td>
             </tr>

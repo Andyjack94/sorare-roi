@@ -4,40 +4,67 @@ export default function HomePage() {
   return (
     <div
       style={{
-        maxWidth: 800,
-        margin: "0 auto",
-        textAlign: "center",
-        paddingTop: "3rem",
+        minHeight: "100vh",
+        background: "#0f172a",
+        padding: "3rem 1rem",
+        color: "white",
       }}
     >
-      <h1
-        style={{
-          fontSize: "2.8rem",
-          marginBottom: "2.5rem",
-          fontWeight: 700,
-        }}
-      >
-        AndyisaGooden’s Sorare ROI
-      </h1>
+      {/* Inline CSS for hover animation */}
+      <style>
+        {`
+          .fun-link {
+            display: inline-block;
+            padding: 0.75rem 1.25rem;
+            background: #1e40af;
+            border-radius: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            border: 1px solid #3b82f6;
+            transition: transform 0.2s ease, background 0.2s ease;
+          }
+          .fun-link:hover {
+            transform: scale(1.05);
+            background: #2563eb;
+          }
+        `}
+      </style>
 
+      {/* Top bar */}
       <div
         style={{
+          maxWidth: 900,
+          margin: "0 auto 3rem auto",
           display: "flex",
-          flexDirection: "column",
-          gap: "1.5rem",
-          maxWidth: 400,
-          margin: "0 auto",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        {/* ⭐ NEW BUTTON — FIRST POSITION */}
+        <h1 style={{ fontSize: "2rem", fontWeight: 700 }}>Sorare ROI Dashboard</h1>
+        <span style={{ color: "#94a3b8", fontSize: "0.9rem" }}>AndyisaGooden</span>
+      </div>
+
+      {/* Grid */}
+      <div
+        style={{
+          maxWidth: 900,
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: "1.2rem",
+        }}
+      >
         <Link
           href="/overall-stats"
           style={{
-            padding: "1rem",
-            background: "#0ea5e9", // sky blue to match your palette
-            color: "white",
-            borderRadius: 8,
+            background: "#1e293b",
+            padding: "1.2rem",
+            borderRadius: 12,
+            border: "1px solid #334155",
             textDecoration: "none",
+            color: "white",
             fontSize: "1.2rem",
             fontWeight: 600,
           }}
@@ -48,26 +75,28 @@ export default function HomePage() {
         <Link
           href="/charts"
           style={{
-            padding: "1rem",
-            background: "#0070f3",
-            color: "white",
-            borderRadius: 8,
+            background: "#1e293b",
+            padding: "1.2rem",
+            borderRadius: 12,
+            border: "1px solid #334155",
             textDecoration: "none",
+            color: "white",
             fontSize: "1.2rem",
             fontWeight: 600,
           }}
         >
-          📊 Charts
+          📊 Competition Breakdown
         </Link>
 
         <Link
           href="/inputs"
           style={{
-            padding: "1rem",
-            background: "#10b981",
-            color: "white",
-            borderRadius: 8,
+            background: "#1e293b",
+            padding: "1.2rem",
+            borderRadius: 12,
+            border: "1px solid #334155",
             textDecoration: "none",
+            color: "white",
             fontSize: "1.2rem",
             fontWeight: 600,
           }}
@@ -78,11 +107,12 @@ export default function HomePage() {
         <Link
           href="/database"
           style={{
-            padding: "1rem",
-            background: "#6366f1",
-            color: "white",
-            borderRadius: 8,
+            background: "#1e293b",
+            padding: "1.2rem",
+            borderRadius: 12,
+            border: "1px solid #334155",
             textDecoration: "none",
+            color: "white",
             fontSize: "1.2rem",
             fontWeight: 600,
           }}
@@ -91,19 +121,16 @@ export default function HomePage() {
         </Link>
       </div>
 
-      <a
-        href="https://sorare.com/football/my-club/andyisagooden?t=HXnONS&utm_medium=social&utm_term=football"
-        target="_blank"
-        style={{
-          display: "inline-block",
-          marginTop: "3rem",
-          color: "#0070f3",
-          fontSize: "1rem",
-          textDecoration: "underline",
-        }}
-      >
-        View My Sorare Club →
-      </a>
+      {/* Fun footer link (CSS-only hover) */}
+      <div style={{ maxWidth: 900, margin: "3rem auto 0 auto", textAlign: "center" }}>
+        <a
+          href="https://sorare.com/football/my-club/andyisagooden?t=HXnONS&utm_medium=social&utm_term=football"
+          target="_blank"
+          className="fun-link"
+        >
+          ⚽ Visit My Sorare Club →
+        </a>
+      </div>
     </div>
   );
 }

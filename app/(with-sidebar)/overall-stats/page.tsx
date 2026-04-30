@@ -14,7 +14,7 @@ export default async function OverallStatsPage() {
     console.error("Stats error:", error);
   }
 
-  // Safely coerce all values to numbers (safe-cast version)
+  // Safely coerce all values to numbers
   const total_rewards = Number((data as any)?.total_rewards ?? 0);
   const total_purchases = Number((data as any)?.total_purchases ?? 0);
   const total_sales = Number((data as any)?.total_sales ?? 0);
@@ -24,22 +24,20 @@ export default async function OverallStatsPage() {
   const total_current_cards = Number((data as any)?.total_current_cards ?? 0);
   const pl_on_card_purchases = Number((data as any)?.pl_on_card_purchases ?? 0);
 
-  // Withdrawals P/L
   const pl_withdrawals = Number((data as any)?.withdrawal ?? 0);
 
-  // Scarcity counts
   const total_limited = Number((data as any)?.total_limited ?? 0);
   const total_rare = Number((data as any)?.total_rare ?? 0);
   const total_super_rare = Number((data as any)?.total_super_rare ?? 0);
   const total_unique = Number((data as any)?.total_unique ?? 0);
 
-  // Typed styles
+  // DARK THEME CARD STYLE
   const cardStyle: CSSProperties = {
-    background: "white",
+    background: "#1e293b",
+    border: "1px solid #334155",
     padding: "1.2rem",
-    borderRadius: "8px",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-    color: "black",
+    borderRadius: "12px",
+    color: "white",
     textAlign: "center",
   };
 
@@ -48,28 +46,40 @@ export default async function OverallStatsPage() {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontWeight: 500,
+    fontWeight: 600,
+    color: "white",
   };
 
   const numberStyle: CSSProperties = {
     fontSize: "1.8rem",
     fontWeight: 700,
     marginTop: "0.5rem",
-    color: "black",
+    color: "white",
     textAlign: "center",
   };
 
   return (
     <div
       style={{
-        padding: "2rem",
-        color: "black",
+        minHeight: "100vh",
+        background: "#0f172a",
+        padding: "3rem 1rem",
+        color: "white",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
       }}
     >
-      <h1 style={{ fontSize: "2rem", fontWeight: 700, marginBottom: "2rem", textAlign: "center" }}>
+      {/* PAGE TITLE */}
+      <h1
+        style={{
+          fontSize: "2rem",
+          fontWeight: 700,
+          marginBottom: "2rem",
+          textAlign: "center",
+          color: "white",
+        }}
+      >
         Overall Stats
       </h1>
 
@@ -90,7 +100,7 @@ export default async function OverallStatsPage() {
           <div
             style={{
               ...numberStyle,
-              color: overall_profit >= 0 ? "green" : "red",
+              color: overall_profit >= 0 ? "#22c55e" : "#ef4444",
               display: "flex",
               justifyContent: "center",
               alignItems: "baseline",
@@ -100,7 +110,7 @@ export default async function OverallStatsPage() {
             £{overall_profit.toFixed(2)}
 
             {total_purchases > 0 && (
-              <span style={{ fontSize: "1.1rem", fontWeight: 600, color: "black" }}>
+              <span style={{ fontSize: "1.1rem", fontWeight: 600, color: "white" }}>
                 ({((overall_profit / total_purchases) * 100).toFixed(2)}%)
               </span>
             )}
@@ -113,7 +123,7 @@ export default async function OverallStatsPage() {
           <div
             style={{
               ...numberStyle,
-              color: pl_withdrawals < 0 ? "green" : "red",
+              color: pl_withdrawals < 0 ? "#22c55e" : "#ef4444",
             }}
           >
             £{pl_withdrawals.toFixed(2)}
@@ -178,11 +188,11 @@ export default async function OverallStatsPage() {
       <div
         style={{
           marginTop: "2rem",
-          background: "white",
+          background: "#1e293b",
+          border: "1px solid #334155",
           padding: "1.5rem",
-          borderRadius: "8px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-          color: "black",
+          borderRadius: "12px",
+          color: "white",
           width: "100%",
           maxWidth: "900px",
           textAlign: "center",
@@ -194,6 +204,7 @@ export default async function OverallStatsPage() {
             fontWeight: 700,
             marginBottom: "1.5rem",
             textAlign: "center",
+            color: "white",
           }}
         >
           Total Players Owned
@@ -223,7 +234,7 @@ export default async function OverallStatsPage() {
           </div>
 
           <div>
-            <div style={{ color: "#111", fontWeight: 600, fontFamily: "Georgia, serif" }}>
+            <div style={{ color: "#ffffff", fontWeight: 600, fontFamily: "Georgia, serif" }}>
               Unique
             </div>
             <div style={{ fontSize: "1.6rem", fontWeight: 700 }}>{total_unique}</div>
@@ -244,7 +255,7 @@ export default async function OverallStatsPage() {
           <div
             style={{
               ...numberStyle,
-              color: pl_on_card_purchases >= 0 ? "green" : "red",
+              color: pl_on_card_purchases >= 0 ? "#22c55e" : "#ef4444",
             }}
           >
             £{pl_on_card_purchases.toFixed(2)}

@@ -5,9 +5,28 @@ html, body {
   font-family: system-ui, sans-serif;
 }
 
-/* Ensure all inputs use black text */
+/* Ensure all inputs use black text globally */
 input, select, textarea, button {
   color: black !important;
+}
+
+/* OVERRIDE ONLY INSIDE INPUTS PAGE */
+.inputs-page input,
+.inputs-page select,
+.inputs-page textarea,
+.inputs-page button {
+  color: white !important;
+}
+
+/* Dropdown options */
+.inputs-page select option {
+  color: white;
+  background: #1e293b;
+}
+
+/* Date input text */
+.inputs-page input[type="date"] {
+  color: white !important;
 }
 
 :root {
