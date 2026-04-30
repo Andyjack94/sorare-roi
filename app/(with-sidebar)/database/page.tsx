@@ -213,6 +213,7 @@ export default function DatabasePage() {
         </tbody>
       </table>
 
+      {/* PAGINATION WITH INLINE GO-TO-PAGE INPUT */}
       <div
         style={{
           marginTop: '1rem',
@@ -236,8 +237,40 @@ export default function DatabasePage() {
           Previous
         </button>
 
-        <span>
-          Page {page} of {totalPages}
+        {/* INLINE PAGE INPUT */}
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          Page
+
+          <input
+            type="number"
+            min={1}
+            max={totalPages}
+            value={page}
+            onChange={e => {
+              const value = Number(e.target.value);
+              if (!isNaN(value)) {
+                setPage(Math.min(Math.max(value, 1), totalPages));
+              }
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const value = Number((e.target as HTMLInputElement).value);
+                if (!isNaN(value)) {
+                  setPage(Math.min(Math.max(value, 1), totalPages));
+                }
+              }
+            }}
+            style={{
+              width: '60px',
+              padding: '0.3rem',
+              fontSize: 14,
+              border: '1px solid #ddd',
+              borderRadius: 4,
+              textAlign: 'center',
+            }}
+          />
+
+          of {totalPages}
         </span>
 
         <button
