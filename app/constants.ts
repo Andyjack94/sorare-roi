@@ -2,8 +2,6 @@
 
 export const COMPETITIONS = [
   "All Star (Pre-2023)",
-  "Beat the Game Limited",
-  "Beat the Game Rare",
   "Bundesliga 2026",
   "Cap 240 Limited",
   "Cap 240 Rare",

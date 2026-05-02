@@ -1,15 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabaseClient';
 import { TransactionRow } from '@/types/types';
 
 export default function DatabasePage() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
   // STATE
   const [rows, setRows] = useState<TransactionRow[]>([]);
   const [totalRows, setTotalRows] = useState(0);
@@ -52,7 +47,25 @@ export default function DatabasePage() {
 
     const { data, count } = await query;
 
-    setRows(data || []);
+    // ⭐ NORMALISE NULLS → match your strict TransactionRow type
+    const normalized: TransactionRow[] = (data || []).map((row: any) => ({
+      id: row.id,
+      date: row.date ?? '',
+      sale_date: row.sale_date ?? '',
+      type: row.type ?? '',
+      card_id: row.card_id ?? '',
+      player_name: row.player_name ?? '',
+      scarcity: row.scarcity ?? '',
+      competition: row.competition ?? '',
+      purchase_value: row.purchase_value ?? 0,
+      sale_value: row.sale_value ?? 0,
+      profit: row.profit ?? 0,
+      notes: row.notes ?? '',
+      created_at: row.created_at ?? '',
+      year: row.year ?? 0,
+    }));
+
+    setRows(normalized);
     setTotalRows(count || 0);
   }
 
@@ -101,6 +114,7 @@ export default function DatabasePage() {
 
   return (
     <div
+      className="database-page"
       style={{
         minHeight: '100vh',
         background: '#0f172a',
@@ -226,7 +240,7 @@ export default function DatabasePage() {
           </thead>
 
           <tbody>
-            {rows.map((t, i) => (
+            {rows.map(t => (
               <tr key={t.id}>
                 <td style={{ whiteSpace: 'nowrap' }}>
                   <button className="action-btn edit-btn" onClick={() => handleEdit(t)}>
@@ -238,7 +252,7 @@ export default function DatabasePage() {
                 </td>
 
                 <td>{t.date}</td>
-                <td>{t.sale_date || ''}</td>
+                <td>{t.sale_date}</td>
                 <td>{t.type}</td>
                 <td>{t.card_id}</td>
                 <td>{t.player_name}</td>

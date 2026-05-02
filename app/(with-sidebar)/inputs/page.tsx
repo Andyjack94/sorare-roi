@@ -2,15 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
+
+// ✅ FIX: use shared client instead of createClient()
+import { supabase } from "@/lib/supabaseClient";
+
 import { COMPETITIONS, SCARCITY } from "@/app/constants";
 
 export default function InputsPage() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -77,9 +75,13 @@ export default function InputsPage() {
       if (type === "sale") updateData.sale_value = Number(saleValue);
       if (type === "reward") updateData.sale_value = Number(rewardValue);
       if (type === "deposit") updateData.purchase_value = Number(dwValue);
-      if (type === "withdrawal") updateData.purchase_value = Number(dwValue) * -1;
+      if (type === "withdrawal")
+        updateData.purchase_value = Number(dwValue) * -1;
 
-      res = await supabase.from("transactions").update(updateData).eq("id", editId);
+      res = await supabase
+        .from("transactions")
+        .update(updateData)
+        .eq("id", editId);
     } else {
       if (type === "purchase") {
         res = await supabase.from("transactions").insert({
@@ -142,11 +144,11 @@ export default function InputsPage() {
     resetFields();
     setType("");
     setSuccessMessage(isEditing ? "Entry updated!" : "Entry submitted!");
+
     setTimeout(() => setSuccessMessage(""), 2500);
 
     if (isEditing) router.push("/database");
   };
-
   const inputStyle: React.CSSProperties = {
     padding: "0.9rem 1rem",
     border: "1px solid #475569",
@@ -190,7 +192,9 @@ export default function InputsPage() {
     playerName && scarcity && competition && saleValue && date && cardId;
 
   const isRewardValid = competition && rewardValue && date;
+
   const isDepositValid = dwValue && date;
+
   const isWithdrawalValid = dwValue && date;
 
   const typeButton = (value: string, label: string) => (
@@ -268,7 +272,6 @@ export default function InputsPage() {
         {typeButton("deposit", "Deposit")}
         {typeButton("withdrawal", "Withdrawal")}
       </div>
-
       {type === "purchase" && (
         <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           <input

@@ -29,6 +29,25 @@ input, select, textarea, button {
   color: white !important;
 }
 
+/* OVERRIDE ONLY INSIDE DATABASE PAGE */
+.database-page input,
+.database-page select,
+.database-page textarea,
+.database-page button {
+  color: white !important;
+}
+
+/* Dropdown options for database page */
+.database-page select option {
+  color: white;
+  background: #1e293b;
+}
+
+/* Date input text for database page */
+.database-page input[type="date"] {
+  color: white !important;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
