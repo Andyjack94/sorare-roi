@@ -1,5 +1,3 @@
-"use client";
-
 import { ProfitTableRow } from "@/types/types";
 import React from "react";
 

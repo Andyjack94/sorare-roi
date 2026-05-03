@@ -52,9 +52,51 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               📈 Overall Stats
             </Link>
 
+            {/* Parent link (clickable) */}
             <Link href="/charts" style={{ color: "white", textDecoration: "none" }}>
               📊 Competition Breakdown
             </Link>
+
+            {/* Dropdown for Series */}
+            <details style={{ cursor: "pointer", marginLeft: "0.5rem" }}>
+              <summary
+                style={{
+                  color: "white",
+                  fontSize: "0.9rem",
+                  opacity: 0.8,
+                  listStyle: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Series Breakdown
+              </summary>
+
+              <div
+                style={{
+                  marginLeft: "1rem",
+                  marginTop: "0.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.4rem",
+                }}
+              >
+                <Link href="/series/sorare-27" style={{ color: "white", textDecoration: "none" }}>
+                  • Sorare 27
+                </Link>
+                <Link href="/series/sorare-26" style={{ color: "white", textDecoration: "none" }}>
+                  • Sorare 26
+                </Link>
+                <Link href="/series/sorare-24-25" style={{ color: "white", textDecoration: "none" }}>
+                  • Sorare 24/25
+                </Link>
+                <Link href="/series/cap-240" style={{ color: "white", textDecoration: "none" }}>
+                  • Cap 240
+                </Link>
+                <Link href="/series/early-sorare" style={{ color: "white", textDecoration: "none" }}>
+                  • Early Sorare
+                </Link>
+              </div>
+            </details>
 
             <Link href="/inputs" style={{ color: "white", textDecoration: "none" }}>
               📝 Inputs
