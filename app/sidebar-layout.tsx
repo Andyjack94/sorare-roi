@@ -52,6 +52,47 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               📈 Overall Stats
             </Link>
 
+            {/* Year Breakdown Dropdown */}
+            <details style={{ cursor: "pointer", marginLeft: "0.5rem" }}>
+              <summary
+                style={{
+                  color: "white",
+                  fontSize: "0.9rem",
+                  opacity: 0.8,
+                  listStyle: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Year Breakdown
+              </summary>
+
+              <div
+                style={{
+                  marginLeft: "1rem",
+                  marginTop: "0.5rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.4rem",
+                }}
+              >
+                <Link href="/overall-stats/year-breakdown/2026" style={{ color: "white", textDecoration: "none" }}>
+                  • 2026
+                </Link>
+                <Link href="/overall-stats/year-breakdown/2025" style={{ color: "white", textDecoration: "none" }}>
+                  • 2025
+                </Link>
+                <Link href="/overall-stats/year-breakdown/2024" style={{ color: "white", textDecoration: "none" }}>
+                  • 2024
+                </Link>
+                <Link href="/overall-stats/year-breakdown/2023" style={{ color: "white", textDecoration: "none" }}>
+                  • 2023
+                </Link>
+                <Link href="/overall-stats/year-breakdown/2022" style={{ color: "white", textDecoration: "none" }}>
+                  • 2022
+                </Link>
+              </div>
+            </details>
+
             {/* Parent link (clickable) */}
             <Link href="/charts" style={{ color: "white", textDecoration: "none" }}>
               📊 Competition Breakdown
