@@ -18,18 +18,27 @@ export default async function SeriesPage({
   const label = SERIES_LABELS[slug];
 
   if (!rule || !label) {
-    return <div style={{ padding: "2rem", textAlign: "center" }}>Unknown series: {slug}</div>;
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#0f172a",
+          color: "white",
+          padding: "3rem 1rem",
+          textAlign: "center",
+        }}
+      >
+        Unknown series: {slug}
+      </div>
+    );
   }
 
-  // ⭐ Fetch ALL rows using server client
+  // Fetch ALL rows
   const { data: transactions } = await supabaseServer
     .from("transactions")
     .select("*")
     .range(0, 50000);
 
-  console.log("TOTAL TRANSACTIONS RECEIVED:", transactions?.length);
-
-  // Normalise competition
   const normaliseComp = (value: any) =>
     (value ?? "")
       .toString()
@@ -44,7 +53,6 @@ export default async function SeriesPage({
     return rule(comp);
   };
 
-  // ⭐ Filter rows belonging to this series
   const seriesRows = (transactions ?? []).filter((row: any) =>
     matchCompetition(row)
   );
@@ -119,7 +127,7 @@ export default async function SeriesPage({
     (a, b) => b[1] - a[1]
   )[0];
 
-  // ⭐ NEW: Most expensive purchase + sale
+  // --- Most expensive purchase + sale ---
   const mostExpensivePurchase = seriesRows
     .filter((r: any) => r.type === "purchase")
     .sort((a: any, b: any) => (b.purchase_value ?? 0) - (a.purchase_value ?? 0))[0];
@@ -128,107 +136,130 @@ export default async function SeriesPage({
     .filter((r: any) => r.type === "sale")
     .sort((a: any, b: any) => (b.sale_value ?? 0) - (a.sale_value ?? 0))[0];
 
-  // ⭐ Colour coding for P/L text only
   const getPLColor = (value: number) => {
-    if (value > 0) return "#0f8a3f";   // green
-    if (value < 0) return "#b32020";   // red
-    return "#444444";                  // neutral grey
+    if (value > 0) return "#22c55e";
+    if (value < 0) return "#ef4444";
+    return "#94a3b8";
   };
 
   return (
-    <div style={{ padding: "2rem", textAlign: "center" }}>
-      <h1
-        style={{
-          fontSize: "2rem",
-          fontWeight: 700,
-          marginBottom: "2rem",
-          color: "black",
-          textAlign: "center",
-        }}
-      >
-        {label} Overview
-      </h1>
-
-      {/* ⭐ TOP LINE: OVERALL P/L ONLY */}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0f172a",
+        padding: "3rem 1rem",
+        color: "white",
+      }}
+    >
+      {/* Page Title */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
+          maxWidth: 900,
+          margin: "0 auto 2.5rem auto",
           textAlign: "center",
         }}
       >
-        <StatCard
-          label="Overall P/L"
-          value={overallPL}
-          sublabel={`${roiPercent.toFixed(2)}% ROI`}
-          valueColor={getPLColor(overallPL)}
-        />
+        <h1
+          style={{
+            fontSize: "2rem",
+            fontWeight: 700,
+            marginBottom: "0.5rem",
+            color: "white",
+          }}
+        >
+          {label} Overview
+        </h1>
+
+        <p
+          style={{
+            color: "#94a3b8",
+            fontSize: "0.95rem",
+            marginTop: "0.25rem",
+          }}
+        >
+          Purchases, rewards, and performance for this series.
+        </p>
       </div>
 
-      {/* ⭐ SECOND LINE: Purchases + Rewards */}
+      {/* Content Grid */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
-          textAlign: "center",
+          maxWidth: 900,
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: "2rem",
         }}
       >
-        <StatCard label="Purchases" value={totalPurchases} />
-        <StatCard label="Rewards" value={totalRewards} />
+        {/* OVERALL P/L */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1.5rem" }}>
+          <StatCard
+            label="Overall P/L"
+            value={overallPL}
+            sublabel={`${roiPercent.toFixed(2)}% ROI`}
+            valueColor={getPLColor(overallPL)}
+          />
+        </div>
+
+        {/* Purchases + Rewards */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+          }}
+        >
+          <StatCard label="Purchases" value={totalPurchases} />
+          <StatCard label="Rewards" value={totalRewards} />
+        </div>
+
+        {/* Top competitions */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+          }}
+        >
+          <StatCard
+            label="Top Competition (Rewards)"
+            value={topRewardCompetition?.[1] ?? 0}
+            sublabel={topRewardCompetition?.[0] ?? "—"}
+          />
+
+          <StatCard
+            label="Best P/L Competition"
+            value={bestPLCompetition?.[1] ?? 0}
+            sublabel={bestPLCompetition?.[0] ?? "—"}
+          />
+        </div>
+
+        {/* Most expensive purchase + sale */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+          }}
+        >
+          <StatCard
+            label="Most Expensive Purchase"
+            value={mostExpensivePurchase?.purchase_value ?? 0}
+            sublabel={mostExpensivePurchase?.player_name ?? "—"}
+          />
+
+          <StatCard
+            label="Most Expensive Sale"
+            value={mostExpensiveSale?.sale_value ?? 0}
+            sublabel={mostExpensiveSale?.player_name ?? "—"}
+          />
+        </div>
+
+        {/* TABLE */}
+        <div className="dark-table-container">
+          <ProfitTable data={profitRows} />
+        </div>
       </div>
-
-      {/* ⭐ THIRD LINE: Top competition + Best P/L */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
-          textAlign: "center",
-        }}
-      >
-        <StatCard
-          label="Top Competition (Rewards)"
-          value={topRewardCompetition?.[1] ?? 0}
-          sublabel={topRewardCompetition?.[0] ?? "—"}
-        />
-
-        <StatCard
-          label="Best P/L Competition"
-          value={bestPLCompetition?.[1] ?? 0}
-          sublabel={bestPLCompetition?.[0] ?? "—"}
-        />
-      </div>
-
-      {/* ⭐ FOURTH LINE: Most expensive purchase + sale */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
-          textAlign: "center",
-        }}
-      >
-        <StatCard
-          label="Most Expensive Purchase"
-          value={mostExpensivePurchase?.purchase_value ?? 0}
-          sublabel={mostExpensivePurchase?.player_name ?? "—"}
-        />
-
-        <StatCard
-          label="Most Expensive Sale"
-          value={mostExpensiveSale?.sale_value ?? 0}
-          sublabel={mostExpensiveSale?.player_name ?? "—"}
-        />
-      </div>
-
-      {/* TABLE */}
-      <ProfitTable data={profitRows} />
     </div>
   );
 }
@@ -248,13 +279,20 @@ function StatCard({
     <div
       style={{
         padding: "1.5rem",
-        borderRadius: "8px",
-        background: "white",
-        border: "1px solid #ddd",
+        borderRadius: "12px",
+        background: "#1e293b",
+        border: "1px solid #334155",
         textAlign: "center",
       }}
     >
-      <div style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+      <div
+        style={{
+          fontSize: "1rem",
+          fontWeight: 600,
+          marginBottom: "0.5rem",
+          color: "#e2e8f0",
+        }}
+      >
         {label}
       </div>
 
@@ -262,7 +300,7 @@ function StatCard({
         style={{
           fontSize: "1.8rem",
           fontWeight: 700,
-          color: valueColor ?? "black",
+          color: valueColor ?? "white",
         }}
       >
         £{value.toFixed(2)}
@@ -272,7 +310,7 @@ function StatCard({
         <div
           style={{
             marginTop: "0.5rem",
-            color: valueColor ?? "#555",
+            color: "#94a3b8",
             fontWeight: 600,
           }}
         >

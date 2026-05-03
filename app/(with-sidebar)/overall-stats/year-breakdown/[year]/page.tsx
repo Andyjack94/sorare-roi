@@ -22,28 +22,41 @@ export default async function YearPage({
 }: {
   params: Promise<{ year: string }>;
 }) {
-  // ⭐ Next.js 15/16: params is a Promise
   const { year: yearString } = await params;
-
   const year = parseInt(yearString, 10);
 
   if (Number.isNaN(year)) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#0f172a",
+          color: "white",
+          padding: "3rem 1rem",
+          textAlign: "center",
+        }}
+      >
         Invalid year in URL.
       </div>
     );
   }
 
-  const { data, error } = (await supabaseServer.rpc(
-    "year_breakdown_stats",
-    { year_input: year }
-  )) as { data: YearStats[] | null; error: any };
+  const { data, error } = (await supabaseServer.rpc("year_breakdown_stats", {
+    year_input: year,
+  })) as { data: YearStats[] | null; error: any };
 
   if (error) {
     console.error("RPC ERROR:", error);
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#0f172a",
+          color: "white",
+          padding: "3rem 1rem",
+          textAlign: "center",
+        }}
+      >
         Error loading stats.
       </div>
     );
@@ -53,7 +66,15 @@ export default async function YearPage({
 
   if (!stats) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#0f172a",
+          color: "white",
+          padding: "3rem 1rem",
+          textAlign: "center",
+        }}
+      >
         No data found for {year}.
       </div>
     );
@@ -74,96 +95,123 @@ export default async function YearPage({
     totalPurchases > 0 ? (overallPL / totalPurchases) * 100 : 0;
 
   const getPLColor = (value: number) => {
-    if (value > 0) return "#0f8a3f";
-    if (value < 0) return "#b32020";
-    return "#444444";
+    if (value > 0) return "#22c55e";
+    if (value < 0) return "#ef4444";
+    return "#94a3b8";
   };
 
   return (
-    <div style={{ padding: "2rem", textAlign: "center" }}>
-      <h1
-        style={{
-          fontSize: "2rem",
-          fontWeight: 700,
-          marginBottom: "2rem",
-          color: "black",
-        }}
-      >
-        Year Breakdown — {year}
-      </h1>
-
-      {/* TOP LINE: OVERALL P/L */}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0f172a",
+        padding: "3rem 1rem",
+        color: "white",
+      }}
+    >
+      {/* Page Title */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
+          maxWidth: 900,
+          margin: "0 auto 2.5rem auto",
+          textAlign: "center",
         }}
       >
-        <StatCard
-          label="Overall P/L"
-          value={overallPL}
-          sublabel={`${roiPercent.toFixed(2)}% ROI`}
-          valueColor={getPLColor(overallPL)}
-        />
+        <h1
+          style={{
+            fontSize: "2rem",
+            fontWeight: 700,
+            marginBottom: "0.5rem",
+            color: "white",
+          }}
+        >
+          Year Breakdown — {year}
+        </h1>
+
+        <p
+          style={{
+            color: "#94a3b8",
+            fontSize: "0.95rem",
+            marginTop: "0.25rem",
+          }}
+        >
+          Performance, purchases, sales, and rewards for the year.
+        </p>
       </div>
 
-      {/* SECOND LINE: Purchases / Sales / Rewards */}
+      {/* Content Grid */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr 1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
+          maxWidth: 900,
+          margin: "0 auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: "2rem",
         }}
       >
-        <StatCard label="Total Purchases" value={totalPurchases} />
-        <StatCard label="Total Sales" value={totalSales} />
-        <StatCard label="Total Rewards" value={totalRewards} />
-      </div>
+        {/* OVERALL P/L */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1.5rem" }}>
+          <StatCard
+            label="Overall P/L"
+            value={overallPL}
+            sublabel={`${roiPercent.toFixed(2)}% ROI`}
+            valueColor={getPLColor(overallPL)}
+          />
+        </div>
 
-      {/* THIRD LINE: Counts (PLAIN NUMBERS) */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
-        }}
-      >
-        <StatCard
-          label="Cards Purchased"
-          value={totalCardsPurchased}
-          plainNumber={true}
-        />
-        <StatCard
-          label="Player Rewards"
-          value={totalPlayerRewards}
-          plainNumber={true}
-        />
-      </div>
+        {/* Purchases / Sales / Rewards */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gap: "1.5rem",
+          }}
+        >
+          <StatCard label="Total Purchases" value={totalPurchases} />
+          <StatCard label="Total Sales" value={totalSales} />
+          <StatCard label="Total Rewards" value={totalRewards} />
+        </div>
 
-      {/* FOURTH LINE: Most expensive purchase + sale */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "1.5rem",
-          marginBottom: "2rem",
-        }}
-      >
-        <StatCard
-          label="Most Expensive Purchase"
-          value={topPurchaseValue}
-          sublabel={stats.top_purchase_player ?? "—"}
-        />
+        {/* Counts */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+          }}
+        >
+          <StatCard
+            label="Cards Purchased"
+            value={totalCardsPurchased}
+            plainNumber={true}
+          />
+          <StatCard
+            label="Player Rewards"
+            value={totalPlayerRewards}
+            plainNumber={true}
+          />
+        </div>
 
-        <StatCard
-          label="Most Expensive Sale"
-          value={topSaleValue}
-          sublabel={stats.top_sale_player ?? "—"}
-        />
+        {/* Most Expensive Purchase / Sale */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+          }}
+        >
+          <StatCard
+            label="Most Expensive Purchase"
+            value={topPurchaseValue}
+            sublabel={stats.top_purchase_player ?? "—"}
+          />
+
+          <StatCard
+            label="Most Expensive Sale"
+            value={topSaleValue}
+            sublabel={stats.top_sale_player ?? "—"}
+          />
+        </div>
       </div>
     </div>
   );
@@ -186,13 +234,20 @@ function StatCard({
     <div
       style={{
         padding: "1.5rem",
-        borderRadius: "8px",
-        background: "white",
-        border: "1px solid #ddd",
+        borderRadius: "12px",
+        background: "#1e293b",
+        border: "1px solid #334155",
         textAlign: "center",
       }}
     >
-      <div style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+      <div
+        style={{
+          fontSize: "1rem",
+          fontWeight: 600,
+          marginBottom: "0.5rem",
+          color: "#e2e8f0",
+        }}
+      >
         {label}
       </div>
 
@@ -200,7 +255,7 @@ function StatCard({
         style={{
           fontSize: "1.8rem",
           fontWeight: 700,
-          color: valueColor ?? "black",
+          color: valueColor ?? "white",
         }}
       >
         {plainNumber ? value : `£${value.toFixed(2)}`}
@@ -210,7 +265,7 @@ function StatCard({
         <div
           style={{
             marginTop: "0.5rem",
-            color: valueColor ?? "#555",
+            color: "#94a3b8",
             fontWeight: 600,
           }}
         >
