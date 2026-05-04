@@ -119,6 +119,23 @@ export default function HomePage() {
         >
           📁 Database Review
         </Link>
+
+        {/* NEW — NCE Tracker */}
+        <Link
+          href="/nce-tracker"
+          style={{
+            background: "#1e293b",
+            padding: "1.2rem",
+            borderRadius: 12,
+            border: "1px solid #334155",
+            textDecoration: "none",
+            color: "white",
+            fontSize: "1.2rem",
+            fontWeight: 600,
+          }}
+        >
+          🎯 NCE Tracker
+        </Link>
       </div>
 
       {/* Fun footer link (CSS-only hover) */}
