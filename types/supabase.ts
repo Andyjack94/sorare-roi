@@ -7,11 +7,37 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
+      nce_inputs: {
+        Row: {
+          account: string
+          created_at: string | null
+          date: string
+          id: string
+          reward_value: number
+        }
+        Insert: {
+          account: string
+          created_at?: string | null
+          date: string
+          id?: string
+          reward_value: number
+        }
+        Update: {
+          account?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          reward_value?: number
+        }
+        Relationships: []
+      }
       Test: {
         Row: {
           card_id: number | null
@@ -153,7 +179,7 @@ export type Database = {
       competition_profit: {
         Row: {
           competition: string | null
-          total_profit: number | null
+          gross_profit: number | null
         }
         Relationships: []
       }
@@ -177,10 +203,15 @@ export type Database = {
           overall_profit: number | null
           pl_on_card_purchases: number | null
           total_current_cards: number | null
+          total_limited: number | null
           total_player_rewards: number | null
           total_purchases: number | null
+          total_rare: number | null
           total_rewards: number | null
           total_sales: number | null
+          total_super_rare: number | null
+          total_unique: number | null
+          withdrawal: number | null
         }
         Relationships: []
       }
@@ -216,29 +247,25 @@ export type Database = {
         Relationships: []
       }
     }
-
     Functions: {
       year_breakdown_stats: {
-        Args: {
-          year_input: number
-        }
+        Args: { year_input: number }
         Returns: {
           overall_pl: number
-          total_purchases: number
-          total_sales: number
-          total_rewards: number
+          top_purchase_card: string
+          top_purchase_player: string
+          top_purchase_value: number
+          top_sale_card: string
+          top_sale_player: string
+          top_sale_value: number
           total_cards_purchased: number
           total_player_rewards: number
-          top_purchase_player: string | null
-          top_purchase_card: string | null
-          top_purchase_value: number | null
-          top_sale_player: string | null
-          top_sale_card: string | null
-          top_sale_value: number | null
+          total_purchases: number
+          total_rewards: number
+          total_sales: number
         }[]
       }
     }
-
     Enums: {
       [_ in never]: never
     }

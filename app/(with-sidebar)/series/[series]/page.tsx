@@ -2,7 +2,7 @@ console.log("PAGE IS RUNNING ON:", typeof window === "undefined" ? "SERVER" : "C
 
 export const dynamic = "force-dynamic";
 
-import { supabaseServer } from "@/lib/supabaseServer";
+import { supabaseServer } from "@/server/supabaseServer";
 import { SERIES_LABELS, SERIES_RULES } from "@/lib/series-map";
 import ProfitTable from "@/app/(with-sidebar)/charts/profit-table";
 

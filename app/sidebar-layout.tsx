@@ -146,6 +146,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
             <Link href="/database" style={{ color: "white", textDecoration: "none" }}>
               📁 Database Review
             </Link>
+
+            {/* ⭐ NCE Tracker moved to the bottom */}
+            <Link href="/nce-tracker" style={{ color: "white", textDecoration: "none" }}>
+              🎯 NCE Tracker
+            </Link>
           </nav>
         </aside>
       )}
