@@ -38,7 +38,7 @@ export default function NCETrackerLayout({
             fontSize: "0.95rem",
           }}
         >
-          Rewards, inputs, and performance overview.
+          Rewards, inputs, withdrawals, and performance overview.
         </p>
       </div>
 
@@ -54,6 +54,7 @@ export default function NCETrackerLayout({
       >
         <Tab href="/nce-tracker/rewards" label="Rewards" />
         <Tab href="/nce-tracker/inputs" label="Inputs" />
+        <Tab href="/nce-tracker/withdrawals" label="Withdrawals" />
       </div>
 
       {/* Page Content */}

@@ -1,14 +1,14 @@
 import { supabaseServer } from "@/server/supabaseServer";
-import type { Database } from "@/types/supabase";
-
-type NCEInput = Database["public"]["Tables"]["nce_inputs"]["Row"];
 
 export default async function RewardsPage() {
-  const supabase = supabaseServer;
+  const supabase = supabaseServer as any;
 
-  const { data, error } = await supabase.from("nce_inputs").select("*");
+  // Rewards
+  const { data: rewardsData, error: rewardsError } = await supabase
+    .from("nce_inputs")
+    .select("*");
 
-  if (error || !data) {
+  if (rewardsError || !rewardsData) {
     return (
       <div style={{ color: "white", textAlign: "center" }}>
         Error loading data
@@ -16,28 +16,43 @@ export default async function RewardsPage() {
     );
   }
 
-  const rows: NCEInput[] = data;
+  const rows = rewardsData as Array<{
+    account?: string;
+    date?: string;
+    reward_value?: number | string;
+  }>;
 
   const total = rows.reduce(
-    (a: number, b: NCEInput) => a + Number(b.reward_value),
+    (acc, r) => acc + Number(r.reward_value ?? 0),
     0
   );
 
   const y2025 = rows
-    .filter((r) => r.date.startsWith("2025"))
-    .reduce((a, b) => a + Number(b.reward_value), 0);
+    .filter((r) => typeof r.date === "string" && r.date.startsWith("2025"))
+    .reduce((acc, r) => acc + Number(r.reward_value ?? 0), 0);
 
   const y2026 = rows
-    .filter((r) => r.date.startsWith("2026"))
-    .reduce((a, b) => a + Number(b.reward_value), 0);
+    .filter((r) => typeof r.date === "string" && r.date.startsWith("2026"))
+    .reduce((acc, r) => acc + Number(r.reward_value ?? 0), 0);
 
   const loz = rows
     .filter((r) => r.account === "LozJones97")
-    .reduce((a, b) => a + Number(b.reward_value), 0);
+    .reduce((acc, r) => acc + Number(r.reward_value ?? 0), 0);
 
   const andy = rows
     .filter((r) => r.account === "AndyisaGooden")
-    .reduce((a, b) => a + Number(b.reward_value), 0);
+    .reduce((acc, r) => acc + Number(r.reward_value ?? 0), 0);
+
+  // Withdrawals
+  const { data: wdData } = await supabase
+    .from("lozjones97_withdrawals")
+    .select("value");
+
+  const withdrawalsRows = Array.isArray(wdData) ? wdData : [];
+  const withdrawalsTotal = withdrawalsRows.reduce(
+    (acc, r) => acc + Number((r as any).value ?? 0),
+    0
+  );
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
@@ -69,17 +84,22 @@ export default async function RewardsPage() {
         <StatCard label="LozJones97 Rewards" value={loz} />
         <StatCard label="AndyisaGooden Rewards" value={andy} />
       </div>
+
+      {/* Row 4 */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr",
+          gap: "1.5rem",
+        }}
+      >
+        <StatCard label="LozJones97 Withdrawals" value={withdrawalsTotal} />
+      </div>
     </div>
   );
 }
 
-function StatCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: number;
-}) {
+function StatCard({ label, value }: { label: string; value: number }) {
   return (
     <div
       style={{
@@ -108,7 +128,7 @@ function StatCard({
           color: "white",
         }}
       >
-        £{value.toFixed(2)}
+        £{Number(value ?? 0).toFixed(2)}
       </div>
     </div>
   );
