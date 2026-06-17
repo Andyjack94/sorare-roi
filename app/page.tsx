@@ -88,6 +88,23 @@ export default function HomePage() {
           📊 Competition Breakdown
         </Link>
 
+        {/* ⭐ NEW — Sorare Sets */}
+        <Link
+          href="/sorare-sets/overview"
+          style={{
+            background: "#1e293b",
+            padding: "1.2rem",
+            borderRadius: 12,
+            border: "1px solid #334155",
+            textDecoration: "none",
+            color: "white",
+            fontSize: "1.2rem",
+            fontWeight: 600,
+          }}
+        >
+          🎨 Sorare Sets
+        </Link>
+
         <Link
           href="/inputs"
           style={{

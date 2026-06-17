@@ -139,6 +139,11 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
               </div>
             </details>
 
+            {/* ⭐ NEW — Sorare Sets */}
+            <Link href="/sorare-sets/overview" style={{ color: "white", textDecoration: "none" }}>
+              🎨 Sorare Sets
+            </Link>
+
             <Link href="/inputs" style={{ color: "white", textDecoration: "none" }}>
               📝 Inputs
             </Link>
