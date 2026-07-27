@@ -10,7 +10,9 @@ export const COMPETITIONS = [
   "Champion 24/25",
   "Contender 24/25",
   "Eredivisie 2026",
+  "Eredivisie 2027",        // ⭐ Added
   "La Liga 2026",
+  "Liga Portugal 2027",     // ⭐ Added
   "Ligue 1 2026",
   "MLS 2026",
   "MLS 2027",
