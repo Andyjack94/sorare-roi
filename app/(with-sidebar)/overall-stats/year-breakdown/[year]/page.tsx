@@ -15,6 +15,10 @@ type YearStats = {
   top_sale_player: string | null;
   top_sale_card: string | null;
   top_sale_value: number | null;
+
+  // NEW FIELDS
+  total_deposits: number | null;
+  total_withdrawals: number | null;
 };
 
 export default async function YearPage({
@@ -90,6 +94,10 @@ export default async function YearPage({
   const totalPlayerRewards = safe(stats.total_player_rewards);
   const topPurchaseValue = safe(stats.top_purchase_value);
   const topSaleValue = safe(stats.top_sale_value);
+
+  // NEW SAFE VALUES
+  const totalDeposits = safe(stats.total_deposits);
+  const totalWithdrawals = safe(stats.total_withdrawals);
 
   const roiPercent =
     totalPurchases > 0 ? (overallPL / totalPurchases) * 100 : 0;
@@ -211,6 +219,18 @@ export default async function YearPage({
             value={topSaleValue}
             sublabel={stats.top_sale_player ?? "—"}
           />
+        </div>
+
+        {/* Deposits / Withdrawals */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "1.5rem",
+          }}
+        >
+          <StatCard label="Deposits" value={totalDeposits} />
+          <StatCard label="Withdrawals" value={totalWithdrawals} />
         </div>
       </div>
     </div>
