@@ -160,6 +160,8 @@ export default function SorareSetsInputs() {
           <option value="Colours">Colours</option>
           <option value="Stellar Nights">Stellar Nights</option>
           <option value="WNTR">WNTR</option>
+          <option value="HyperGlitch">HyperGlitch</option>
+          <option value="Divination">Divination</option>
         </select>
 
         {/* Value */}
